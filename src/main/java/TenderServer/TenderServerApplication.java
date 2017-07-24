@@ -1,6 +1,8 @@
 package TenderServer;
 
+import TenderServer.api.Transactions;
 import TenderServer.resources.Transaction;
+import TenderServer.resources.TransactionDAO;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
@@ -55,6 +57,10 @@ public class TenderServerApplication extends Application<TenderServerConfigurati
     public void run(final TenderServerConfiguration configuration,
                     final Environment environment) {
         // TODO: implement application
+
+
+        final TransactionDAO transactionDAO = new TransactionDAO(hibernate.getSessionFactory());
+        environment.jersey().register(new Transactions(transactionDAO));
     }
 
 }
