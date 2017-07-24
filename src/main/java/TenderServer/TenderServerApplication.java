@@ -4,6 +4,7 @@ import TenderServer.resources.Transaction;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
+import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -33,8 +34,21 @@ public class TenderServerApplication extends Application<TenderServerConfigurati
 
     @Override
     public void initialize(final Bootstrap<TenderServerConfiguration> bootstrap) {
-        // TODO: application initialization
+        /**
+         * Database connections
+         */
         bootstrap.addBundle(hibernate);
+
+
+        /**
+         * Migrations
+         */
+        bootstrap.addBundle(new MigrationsBundle<TenderServerConfiguration>() {
+            @Override
+            public DataSourceFactory getDataSourceFactory(TenderServerConfiguration configuration) {
+                return configuration.getDataSourceFactory();
+            }
+        });
     }
 
     @Override
