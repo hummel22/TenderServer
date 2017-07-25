@@ -105,11 +105,11 @@ public class TransactionEntry {
     this.value = value;
   }
 
-  public Transaction getTransaction() {
-    return transaction;
-  }
-
   public void setTransaction(Transaction transaction) {
     this.transaction = transaction;
+  }
+
+  public long getTransactionId()  {
+    return this.transaction.getTransactionId();
   }
 }

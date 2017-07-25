@@ -1,9 +1,6 @@
 package TenderServer.api;
 
-import TenderServer.resources.Transaction;
-import TenderServer.resources.TransactionDAO;
-import TenderServer.resources.TransactionEntry;
-import TenderServer.resources.TransactionEntryDAO;
+import TenderServer.resources.*;
 import com.google.common.base.Optional;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
@@ -25,14 +22,16 @@ public class Entries {
    * The DAO object to manipulate employees.
    */
   private TransactionEntryDAO transactionEntryDAO;
-
+  private TransactionDAO transactionDAO;
   /**
    * Constructor.
    *
    */
-  public Entries(TransactionEntryDAO transactionEntryDAO) {
+  public Entries(TransactionEntryDAO transactionEntryDAO, TransactionDAO transactionDAO) {
     this.transactionEntryDAO = transactionEntryDAO;
+    this.transactionDAO = transactionDAO;
   }
+
 
   /**
    * Looks for employees whose first or last name contains the passed
@@ -72,9 +71,8 @@ public class Entries {
 
   @POST
   @UnitOfWork
-  public TransactionEntry update(TransactionEntry transactionEntry) {
-    transactionEntry.log();
-    return transactionEntryDAO.saveOrUpdate(transactionEntry);
+  public TransactionEntry update(TransactionEntryFactory transactionEntryFactory) {
+    return transactionEntryDAO.saveOrUpdate(transactionEntryFactory.buildEntry(transactionDAO));
 
   }
 }

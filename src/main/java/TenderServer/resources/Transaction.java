@@ -3,6 +3,7 @@ package TenderServer.resources;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by MBAIR on 7/24/17.
@@ -38,6 +39,17 @@ public class Transaction {
    */
   @Column(name = "date")
   private Date date;
+
+
+  @OneToMany(mappedBy="transaction")
+  private Set<TransactionEntry> items;
+
+
+
+
+
+
+
 
   public Transaction() {};
   public Transaction(String name, Date date)  {
@@ -92,4 +104,11 @@ public class Transaction {
     this.date = date;
   }
 
+  public Set<TransactionEntry> getItems() {
+    return items;
+  }
+
+  public void setItems(Set<TransactionEntry> items) {
+    this.items = items;
+  }
 }

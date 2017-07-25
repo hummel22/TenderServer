@@ -10,6 +10,7 @@ import java.util.List;
  * Created by MBAIR on 7/25/17.
  */
 public class TransactionEntryDAO extends AbstractDAO<TransactionEntry> {
+
   /**
    * Constructor.
    *
