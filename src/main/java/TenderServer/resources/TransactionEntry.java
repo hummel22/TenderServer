@@ -9,6 +9,14 @@ import java.util.Date;
 
 @Entity
 @Table(name = "entries")
+@NamedQueries({
+        @NamedQuery(name = "com.olledeux.TransactionEntry.findAll",
+                query = "select e from TransactionEntry e"),
+        @NamedQuery(name = "com.olledeux.TransactionEntry.findByName",
+                query = "select e from TransactionEntry e "
+                        + "where e.name like :name "
+        )
+})
 public class TransactionEntry {
   /**
    * Entity's unique identifier.
@@ -36,7 +44,72 @@ public class TransactionEntry {
   /**
    *
    */
-  private long transaction_id;
+  @ManyToOne
+  @JoinColumn(name="transaction_id", nullable=false)
+  private Transaction transaction;
 
 
+  public void log()  {
+    System.out.println("Name " + name);
+    System.out.println("Value: " + value.toString());
+    System.out.println("Transaction : " + transaction.getName());
+  }
+
+
+  public TransactionEntry(String name, Float value, Transaction transaction) {
+    this.name = name;
+    this.value = value;
+    this.transaction = transaction;
+  }
+
+  public TransactionEntry() {
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    TransactionEntry that = (TransactionEntry) o;
+
+    return entry_id == that.entry_id;
+
+  }
+
+  @Override
+  public int hashCode() {
+    return (int) (entry_id ^ (entry_id >>> 32));
+  }
+
+  public long getEntry_id() {
+    return entry_id;
+  }
+
+  public void setEntry_id(long entry_id) {
+    this.entry_id = entry_id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Float getValue() {
+    return value;
+  }
+
+  public void setValue(Float value) {
+    this.value = value;
+  }
+
+  public Transaction getTransaction() {
+    return transaction;
+  }
+
+  public void setTransaction(Transaction transaction) {
+    this.transaction = transaction;
+  }
 }
