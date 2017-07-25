@@ -35,4 +35,28 @@
                           incrementBy="1"
                           tableName="transactions"/>
     </changeSet>
+
+
+    <changeSet id="build_entry_table" author="hummel">
+        <createTable tableName="entries">
+            <column name="entry_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="transaction_id"
+                                 baseTableName="entries"
+                                 constraintName="fk_entry_transaction_id"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="transaction_id"
+                                 referencedTableName="transactions"/>
+    </changeSet>
 </databaseChangeLog>
