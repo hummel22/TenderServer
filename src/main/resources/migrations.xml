@@ -19,4 +19,20 @@
             </column>
         </createTable>
     </changeSet>
+
+    <changeSet author="hummel" id="rename_transaction_id_column">
+        <renameColumn
+                      newColumnName="transaction_id"
+                      oldColumnName="id"
+                      columnDataType="bigint"
+                      tableName="transactions"/>
+    </changeSet>
+
+    <changeSet author="hummel" id="fix_autoincrement">
+        <addAutoIncrement
+                          columnDataType="bigint"
+                          columnName="transaction_id"
+                          incrementBy="1"
+                          tableName="transactions"/>
+    </changeSet>
 </databaseChangeLog>

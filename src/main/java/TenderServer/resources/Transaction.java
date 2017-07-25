@@ -23,8 +23,8 @@ public class Transaction {
    */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-  private long id;
+  @Column(name = "transaction_id")
+  private long transactionId;
 
 
   /**
@@ -59,21 +59,21 @@ public class Transaction {
 
     Transaction that = (Transaction) o;
 
-    return id == that.id;
+    return transactionId == that.transactionId;
 
   }
 
   @Override
   public int hashCode() {
-    return (int) (id ^ (id >>> 32));
+    return (int) (transactionId ^ (transactionId >>> 32));
   }
 
-  public long getId() {
-    return id;
+  public long getTransactionId() {
+    return transactionId;
   }
 
-  public void setId(long id) {
-    this.id = id;
+  public void setTransactionId(long transactionId) {
+    this.transactionId = transactionId;
   }
 
   public String getName() {
