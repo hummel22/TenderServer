@@ -6,8 +6,10 @@ import com.google.common.base.Optional;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
+import javax.swing.text.html.Option;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -61,7 +63,18 @@ public class Transactions {
   @Path("/{id}")
   @UnitOfWork
   public Optional<Transaction> findById(@PathParam("id") LongParam id) {
+
     return transactionDAO.findById(id.get());
+  }
+
+
+
+  @POST
+  @UnitOfWork
+  public Transaction update(Transaction transaction) {
+      transaction.log();
+      return transactionDAO.saveOrUpdate(transaction);
+
   }
 
 }

@@ -22,6 +22,7 @@ public class Transaction {
    * Entity's unique identifier.
    */
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
   private long id;
 
@@ -42,6 +43,11 @@ public class Transaction {
   public Transaction(String name, Date date)  {
     this.name = name;
     this.date = date;
+  }
+
+  public void log()  {
+    System.out.println("Name " + name);
+    System.out.println("Date: " + date.toString());
   }
 
 

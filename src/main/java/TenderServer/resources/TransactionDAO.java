@@ -2,8 +2,10 @@ package TenderServer.resources;
 
 import com.google.common.base.Optional;
 import io.dropwizard.hibernate.AbstractDAO;
+import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -55,5 +57,10 @@ public class TransactionDAO extends AbstractDAO<Transaction> {
    */
   public Optional<Transaction> findById(long id) {
     return Optional.fromNullable(get(id));
+  }
+
+
+  public Transaction saveOrUpdate(Transaction transaction) {
+    return super.persist(transaction);
   }
 }
