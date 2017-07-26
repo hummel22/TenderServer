@@ -59,4 +59,39 @@
                                  referencedColumnNames="transaction_id"
                                  referencedTableName="transactions"/>
     </changeSet>
+
+
+    <changeSet id="tag_table" author="hummel">
+        <createTable tableName="tags">
+            <column name="tag_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="tags_entries">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entry_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="tag_id"
+                                 baseTableName="tags_entries"
+                                 constraintName="fk_tag_id"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="tag_id"
+                                 referencedTableName="tags"/>
+        <addForeignKeyConstraint baseColumnNames="entry_id"
+                                 baseTableName="tags_entries"
+                                 constraintName="fk_entry_id"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="entry_id"
+                                 referencedTableName="entries"/>
+    </changeSet>
 </databaseChangeLog>

@@ -1,11 +1,9 @@
 package TenderServer;
 
 import TenderServer.api.Entries;
+import TenderServer.api.Tags;
 import TenderServer.api.Transactions;
-import TenderServer.resources.Transaction;
-import TenderServer.resources.TransactionDAO;
-import TenderServer.resources.TransactionEntry;
-import TenderServer.resources.TransactionEntryDAO;
+import TenderServer.resources.*;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
@@ -29,7 +27,7 @@ public class TenderServerApplication extends Application<TenderServerConfigurati
      * Register the Database connections
      * Uses the config.yaml database to load values - Create the Bindle wrapper to register bundle
      */
-    private final HibernateBundle<TenderServerConfiguration> hibernate = new HibernateBundle<TenderServerConfiguration>(Transaction.class, TransactionEntry.class) {
+    private final HibernateBundle<TenderServerConfiguration> hibernate = new HibernateBundle<TenderServerConfiguration>(Transaction.class, TransactionEntry.class, Tag.class) {
         @Override
         public DataSourceFactory getDataSourceFactory(TenderServerConfiguration configuration) {
             return configuration.getDataSourceFactory();
@@ -75,6 +73,13 @@ public class TenderServerApplication extends Application<TenderServerConfigurati
          */
         final TransactionEntryDAO transactionEntryDAO = new TransactionEntryDAO(hibernate.getSessionFactory());
         environment.jersey().register(new Entries(transactionEntryDAO, transactionDAO));
+
+
+        /**
+         * Register Transacion API
+         */
+        final TagDAO tagDAO = new TagDAO(hibernate.getSessionFactory());
+        environment.jersey().register(new Tags(tagDAO));
     }
 
 }
