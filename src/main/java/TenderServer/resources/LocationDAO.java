@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static jersey.repackaged.com.google.common.base.Optional.absent;
+
+
 /**
  * Created by MBAIR on 7/27/17.
  */
@@ -48,13 +51,18 @@ public class LocationDAO extends AbstractDAO<Location> {
     );
   }
 
-  public List<Location> getLocationByNickName(String nickname){
+  public Optional<Location> getLocationByNickName(String nickname){
     StringBuilder builder = new StringBuilder("%");
     builder.append(nickname).append("%");
-    return list(
+    List<Location> locationList =  list(
             namedQuery("com.olledeux.Location.findByNickName")
-                    .setParameter("name", builder.toString())
+                    .setParameter("nickname", builder.toString())
     );
+    if(locationList.size() > 0)
+    {
+      return Optional.fromNullable(locationList.get(0));
+    }
+    return Optional.fromNullable(null);
   }
 
   /**

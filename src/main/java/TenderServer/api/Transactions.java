@@ -1,7 +1,9 @@
 package TenderServer.api;
 
+import TenderServer.resources.LocationDAO;
 import TenderServer.resources.Transaction;
 import TenderServer.resources.TransactionDAO;
+import TenderServer.resources.TransactionFactory;
 import com.google.common.base.Optional;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
@@ -24,13 +26,15 @@ public class Transactions {
    * The DAO object to manipulate employees.
    */
   private TransactionDAO transactionDAO;
+  private LocationDAO locationDAO;
 
   /**
    * Constructor.
    *
    */
-  public Transactions(TransactionDAO transactionDAO) {
+  public Transactions(TransactionDAO transactionDAO, LocationDAO locationDAO) {
     this.transactionDAO = transactionDAO;
+    this.locationDAO = locationDAO;
   }
 
   /**
@@ -71,10 +75,11 @@ public class Transactions {
 
   @POST
   @UnitOfWork
-  public Transaction update(Transaction transaction) {
+  public Transaction update(TransactionFactory transactionFactory) {
+      transactionFactory.log();
+      Transaction transaction = transactionFactory.buildTransaction(locationDAO);
       transaction.log();
       return transactionDAO.saveOrUpdate(transaction);
-
   }
 
 }

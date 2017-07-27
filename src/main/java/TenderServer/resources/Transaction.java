@@ -2,6 +2,7 @@ package TenderServer.resources;
 
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Set;
 
@@ -45,16 +46,20 @@ public class Transaction {
   private Set<TransactionEntry> items;
 
 
-
-
-
-
+  /**
+   *
+   */
+  @ManyToOne
+  @JoinColumn(name="location_id", nullable=false)
+  private Location location;
 
 
   public Transaction() {};
-  public Transaction(String name, Date date)  {
+
+  public Transaction(String name, Date date, Location location) {
     this.name = name;
     this.date = date;
+    this.location = location;
   }
 
   public void log()  {
@@ -110,5 +115,13 @@ public class Transaction {
 
   public void setItems(Set<TransactionEntry> items) {
     this.items = items;
+  }
+
+  public void setLocation(Location location) {
+    this.location = location;
+  }
+
+  public String getLocation() {
+    return location.getName() + "-" + location.getTown() + "-" + location.getNickname();
   }
 }

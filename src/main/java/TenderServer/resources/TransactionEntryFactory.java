@@ -67,7 +67,7 @@ public class TransactionEntryFactory {
       transaction.get().log();
       return new TransactionEntry(name, value, transaction.get(), tagSet);
     } else  {
-      throw new NotFoundException("Count Not Find Transtion: " + Long.toString(transaction_id));
+      throw new NotFoundException("Count Not Find Transaction: " + Long.toString(transaction_id));
     }
   }
 }

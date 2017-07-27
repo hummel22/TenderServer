@@ -1,6 +1,7 @@
 package TenderServer.resources;
 
 import javax.persistence.*;
+import java.util.Set;
 
 /**
  * Created by MBAIR on 7/27/17.
@@ -46,6 +47,17 @@ public class Location {
   @Column(name = "nickname")
   private String nickname;
 
+
+
+  @OneToMany(mappedBy="location")
+  private Set<Transaction> transactions;
+
+
+  public void log()  {
+   System.out.println("Location" + getName() + "-" + getTown() + "-" + getNickname());
+  }
+
+
   public Location() {
   }
 
@@ -85,6 +97,11 @@ public class Location {
 
   public void setNickname(String nickname) {
     this.nickname = nickname;
+  }
+
+
+  public void setTransactions(Set<Transaction> transactions) {
+    this.transactions = transactions;
   }
 
   @Override
