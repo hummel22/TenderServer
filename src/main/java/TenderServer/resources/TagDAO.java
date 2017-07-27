@@ -4,7 +4,10 @@ import com.google.common.base.Optional;
 import io.dropwizard.hibernate.AbstractDAO;
 import org.hibernate.SessionFactory;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by MBAIR on 7/25/17.
@@ -44,6 +47,21 @@ public class TagDAO extends AbstractDAO<Tag> {
                     .setParameter("name", builder.toString())
     );
   }
+
+   public Set<Tag> stringsToTags(ArrayList<String> stringTags)  {
+     Set<Tag>  tags = new HashSet<Tag>();
+     for(String stringTag : stringTags) {
+       List<Tag> tagList = findByName(stringTag);
+       if(tagList.size() > 0) {
+         for (Tag tag : tagList) {
+           tags.add(tag);
+         }
+       } else {
+         tags.add(saveOrUpdate(new Tag(stringTag)));
+       }
+     }
+     return tags;
+   }
 
   /**
    * Method looks for an employee by her id.

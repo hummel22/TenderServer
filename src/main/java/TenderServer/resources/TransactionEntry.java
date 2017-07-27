@@ -1,7 +1,10 @@
 package TenderServer.resources;
 
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by MBAIR on 7/25/17.
@@ -56,10 +59,11 @@ public class TransactionEntry {
   }
 
 
-  public TransactionEntry(String name, Float value, Transaction transaction) {
+  public TransactionEntry(String name, Float value, Transaction transaction, Set<Tag> tags) {
     this.name = name;
     this.value = value;
     this.transaction = transaction;
+    this.tags = tags;
   }
 
   public TransactionEntry() {
@@ -111,5 +115,23 @@ public class TransactionEntry {
 
   public long getTransactionId()  {
     return this.transaction.getTransactionId();
+  }
+
+
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "tags_entries", joinColumns = { @JoinColumn(name = "entry_id") }, inverseJoinColumns = { @JoinColumn(name = "tag_id") })
+  private Set<Tag> tags;
+  public ArrayList<String> getTags() {
+    ArrayList<String> tags = new ArrayList<String>();
+    if(this.tags != null) {
+      for (Tag tag : this.tags) {
+        tags.add(tag.getName());
+      }
+    }
+    return tags;
+  }
+
+  public void setTags(Set<Tag> tags) {
+    this.tags = tags;
   }
 }

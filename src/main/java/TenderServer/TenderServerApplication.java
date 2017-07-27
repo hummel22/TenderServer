@@ -67,19 +67,21 @@ public class TenderServerApplication extends Application<TenderServerConfigurati
         final TransactionDAO transactionDAO = new TransactionDAO(hibernate.getSessionFactory());
         environment.jersey().register(new Transactions(transactionDAO));
 
+        /**
+         * Register Tag API
+         */
+        final TagDAO tagDAO = new TagDAO(hibernate.getSessionFactory());
+        environment.jersey().register(new Tags(tagDAO));
 
         /**
          * Register Entries API
          */
         final TransactionEntryDAO transactionEntryDAO = new TransactionEntryDAO(hibernate.getSessionFactory());
-        environment.jersey().register(new Entries(transactionEntryDAO, transactionDAO));
+        environment.jersey().register(new Entries(transactionEntryDAO, transactionDAO, tagDAO));
 
 
-        /**
-         * Register Transacion API
-         */
-        final TagDAO tagDAO = new TagDAO(hibernate.getSessionFactory());
-        environment.jersey().register(new Tags(tagDAO));
+
+
     }
 
 }
