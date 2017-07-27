@@ -1,6 +1,7 @@
 package TenderServer;
 
 import TenderServer.api.Entries;
+import TenderServer.api.Locations;
 import TenderServer.api.Tags;
 import TenderServer.api.Transactions;
 import TenderServer.resources.*;
@@ -27,7 +28,7 @@ public class TenderServerApplication extends Application<TenderServerConfigurati
      * Register the Database connections
      * Uses the config.yaml database to load values - Create the Bindle wrapper to register bundle
      */
-    private final HibernateBundle<TenderServerConfiguration> hibernate = new HibernateBundle<TenderServerConfiguration>(Transaction.class, TransactionEntry.class, Tag.class) {
+    private final HibernateBundle<TenderServerConfiguration> hibernate = new HibernateBundle<TenderServerConfiguration>(Transaction.class, TransactionEntry.class, Tag.class, Location.class) {
         @Override
         public DataSourceFactory getDataSourceFactory(TenderServerConfiguration configuration) {
             return configuration.getDataSourceFactory();
@@ -60,6 +61,12 @@ public class TenderServerApplication extends Application<TenderServerConfigurati
     public void run(final TenderServerConfiguration configuration,
                     final Environment environment) {
         // TODO: implement application
+
+        /**
+         * Register Location API
+         */
+        final LocationDAO locationDAO = new LocationDAO(hibernate.getSessionFactory());
+        environment.jersey().register(new Locations(locationDAO));
 
         /**
          * Register Transacion API
