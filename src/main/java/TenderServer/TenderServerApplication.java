@@ -6,6 +6,7 @@ import TenderServer.api.Tags;
 import TenderServer.api.Transactions;
 import TenderServer.resources.*;
 import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
 import io.dropwizard.migrations.MigrationsBundle;
@@ -55,6 +56,8 @@ public class TenderServerApplication extends Application<TenderServerConfigurati
                 return configuration.getDataSourceFactory();
             }
         });
+
+        bootstrap.addBundle(new AssetsBundle("/assets/", "/", "index.html"));
     }
 
     @Override
@@ -85,10 +88,6 @@ public class TenderServerApplication extends Application<TenderServerConfigurati
          */
         final TransactionEntryDAO transactionEntryDAO = new TransactionEntryDAO(hibernate.getSessionFactory());
         environment.jersey().register(new Entries(transactionEntryDAO, transactionDAO, tagDAO));
-
-
-
-
     }
 
 }
