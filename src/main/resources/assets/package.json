@@ -8,8 +8,12 @@
     "babel-loader": "^7.1.1",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
+    "bootstrap": "^4.0.0-alpha.6",
     "react": "^15.6.1",
+    "react-autocomplete": "^1.5.10",
+    "react-datepicker": "^0.52.0",
     "react-dom": "^15.6.1",
+    "react-form": "^1.3.0",
     "webpack": "^3.4.1"
   },
   "devDependencies": {},

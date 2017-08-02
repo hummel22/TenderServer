@@ -1,4 +1,4 @@
-
+set -e
 CURRENT=`pwd`
 cd src/main/resources/assets/
 npm install
