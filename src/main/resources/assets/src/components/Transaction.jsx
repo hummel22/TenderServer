@@ -1,5 +1,6 @@
 import React from 'react';
 import Entry from './Entry.jsx';
+import Autocomplete from '../../node_modules/react-autocomplete/build/lib/index'
 
 
 export default class Transaction extends React.Component {
@@ -14,12 +15,42 @@ export default class Transaction extends React.Component {
         town: ""},
       transactionID: null,
       numberOfEntries: 0,
-      entries: {}
+      entries: {},
+      locations: {
+        apple: {
+          nickname: "apple",
+          location: "Mcdonalds",
+          town: "NewYork"
+        },
+        banana: {
+          nickname: "banana",
+          location: "Wenyds",
+          town: "Vrginia"
+        },
+        pear: {
+          nickname: "pear",
+          location: "KFC",
+          town: "DC"
+        },
+      },
+      tags: {},
+      nicknames: [
+        { label: 'apple' },
+        { label: 'banana' },
+        { label: 'pear' }
+      ],
     };
     this.handleAddEntry = this.handleAddEntry.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleEntryEvent = this.handleEntryEvent.bind(this)
+
+
   }
+
+
+  //TODO updateTagsAndLocations
+      //TODO Populate tags
+      //TODO Populate locations
 
   handleAddEntry()  {
     console.log("Adding Entry")
@@ -39,6 +70,24 @@ export default class Transaction extends React.Component {
     })
   }
 
+  handleSelect(key, val)  {
+    console.log(key)
+    console.log(val)
+    var location = this.state.locations[val]
+    console.log({
+      nickname: location.nickname,
+      location: location.location,
+      town: location.town
+    })
+    this.setState((state,props) => {
+      return {transactionData: Object.assign(state.transactionData, {
+        nickname: location.nickname,
+        location: location.location,
+        town: location.town
+      })}
+    })
+  }
+
   handleEntryEvent(id, ev) {
     ev.persist();
     var key = ev.target.name;
@@ -54,16 +103,16 @@ export default class Transaction extends React.Component {
 
   handleSubmit() {
     console.log(this.state);
-    //Verify Transaction
-    //Verify entries
-      //Convert Tags to Array
-    //throw erroes
+    //TODO Verify Transaction
+    //TODO Verify entries
+      //TODO Convert Tags to Array
+    //TODO throw erroes
 
-    //Send Transaction
-      //Get transaction ID
-    //for loop
-      //send entries with ID
-    //Show succes or not
+    //TODO Send Transaction
+      //TODO Get transaction ID
+    //TODO for loop
+      //TODO send entries with ID
+    //TODO Show succes or not
   }
 
   render() {
@@ -76,29 +125,40 @@ export default class Transaction extends React.Component {
       <form>
         <div className="horizontal">
 
-          <div className="form-group">
+          <div className="form-group" className="vertical">
             <label>Name:</label>
             <input type="text" onChange={this.handleChange.bind(this, "name")} name="Name" className="form-control"/>
           </div>
 
-          <div className="form-group">
+          <div className="form-group" className="vertical">
             <label>Date:</label>
             <input type="text" onChange={this.handleChange.bind(this, "date")} name="Date" className="form-control"/>
           </div>
 
-          <div className="form-group">
+          <div className="form-group" className="vertical">
             <label>NickName:</label>
-            <input type="text" onChange={this.handleChange.bind(this, "nickname")} name="NickName" className="form-control"/>
+            <Autocomplete
+              getItemValue={(item) => item.label}
+              items={this.state.nicknames}
+              renderItem={(item, isHighlighted) =>
+                <div style={{ background: isHighlighted ? 'lightgray' : 'white' }}>
+                  {item.label}
+                </div>
+              }
+              value={this.state.transactionData.nickname}
+              onChange={this.handleChange.bind(this, "nickname")}
+              onSelect={(val) => this.handleSelect("nickname", val)}
+            />
           </div>
 
-          <div className="form-group">
+          <div className="form-group" className="vertical">
             <label>Location:</label>
-            <input type="text" onChange={this.handleChange.bind(this, "location")} name="Location" className="form-control"/>
+            <input value={this.state.transactionData.location} type="text" onChange={this.handleChange.bind(this, "location")} name="Location" className="form-control"/>
           </div>
 
-          <div className="form-group">
+          <div className="form-group" className="vertical">
             <label>Town:</label>
-            <input type="text" onChange={this.handleChange.bind(this, "town")} name="Town" className="form-control"/>
+            <input type="text" value={this.state.transactionData.town} onChange={this.handleChange.bind(this, "town")} name="Town" className="form-control"/>
           </div>
 
 

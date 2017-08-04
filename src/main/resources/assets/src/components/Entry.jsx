@@ -18,17 +18,17 @@ export default class Entry extends React.Component {
 
             <p>{this.props.id}</p>
 
-            <div className="form-group">
+            <div className="form-group" className="vertical">
               <label>Name:</label>
               <input type="text" onChange={this.handleChange} name="name"  className="form-control"/>
             </div>
 
-            <div className="form-group">
+            <div className="form-group" className="vertical">
               <label>Date:</label>
               <input type="text" onChange={this.handleChange} name="value"  className="form-control"/>
             </div>
 
-            <div className="form-group">
+            <div className="form-group" className="vertical">
               <label>Tags:</label>
               <input type="text" onChange={this.handleChange} name="tags" className="form-control"/>
             </div>
