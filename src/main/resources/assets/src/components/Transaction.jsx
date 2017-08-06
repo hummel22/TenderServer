@@ -16,6 +16,13 @@ export default class Transaction extends React.Component {
       transactionID: null,
       numberOfEntries: 0,
       entries: {},
+      /*
+       Entires have data like
+        - name
+        - date
+        - value
+        - tags
+       */
       locations: {
         apple: {
           nickname: "apple",
@@ -33,12 +40,16 @@ export default class Transaction extends React.Component {
           town: "DC"
         },
       },
-      tags: {},
+      tagList: [
+        { label: "Chocolate"},
+        { label: "Fast Food"},
+        { label: "Groceries"}
+      ],
       nicknames: [
         { label: 'apple' },
         { label: 'banana' },
         { label: 'pear' }
-      ],
+      ]
     };
     this.handleAddEntry = this.handleAddEntry.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -58,7 +69,12 @@ export default class Transaction extends React.Component {
     var entriesUpdate = state.numberOfEntries + 1;
       return {
         numberOfEntries: entriesUpdate,
-        entries: Object.assign(state.entries, {[entriesUpdate]:{}})
+        entries: Object.assign(state.entries, {[entriesUpdate]:{
+          name: "",
+          date: "",
+          value: -0.1,
+          tags: []
+        }})
       }
     });
   }
@@ -71,14 +87,7 @@ export default class Transaction extends React.Component {
   }
 
   handleSelect(key, val)  {
-    console.log(key)
-    console.log(val)
     var location = this.state.locations[val]
-    console.log({
-      nickname: location.nickname,
-      location: location.location,
-      town: location.town
-    })
     this.setState((state,props) => {
       return {transactionData: Object.assign(state.transactionData, {
         nickname: location.nickname,
@@ -101,6 +110,21 @@ export default class Transaction extends React.Component {
     })
   }
 
+  addEntryTag(id, tag){
+    console.log("Add tag: " + tag + " to ID " + id);
+    var key = "tags";
+    this.setState((state,props) => {
+      var tags = state.entries[id][key].slice();
+      tags.push(tag);
+      var updateEntry = Object.assign(state.entries[id], {[key]: tags})
+      var entriesUpdate = { [id]: updateEntry }
+      return {
+        entries: entriesUpdate
+      }
+    })
+
+  }
+
   handleSubmit() {
     console.log(this.state);
     //TODO Verify Transaction
@@ -118,7 +142,13 @@ export default class Transaction extends React.Component {
   render() {
     var entries = []
     for(var i = 0; i < this.state.numberOfEntries; i++) {
-      entries.push(<Entry key={i+1} entryChange={this.handleEntryEvent} id={i+1}/>)
+      entries.push(<Entry
+        key={i+1}
+        entryChange={this.handleEntryEvent}
+        id={i+1}
+        tagList={this.state.tagList}
+        newTag={this.addEntryTag.bind(this, i+1)}
+        />)
     }
     return (
       <div>
