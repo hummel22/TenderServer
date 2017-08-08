@@ -16,7 +16,7 @@ export default class Entry extends React.Component {
     this.addTag = this.addTag.bind(this);
     this.selectTag = this.selectTag.bind(this);
     this.handleTagChange = this.handleTagChange.bind(this);
-
+    this.onKeyPress = this.onKeyPress.bind(this);
   }
 
   handleChange(ev) {
@@ -56,6 +56,11 @@ export default class Entry extends React.Component {
     })
   }
 
+  onKeyPress(ev) {
+    if(ev.key == 'Enter'){
+      this.addTag(ev.target.value)
+    }
+  }
 
 
   render() {
@@ -75,7 +80,7 @@ export default class Entry extends React.Component {
               <label>Date:</label>
               <input type="text" onChange={this.handleChange} name="date"  className="form-control"/>
             </div>
-            
+
             <div className="form-group" className="vertical">
               <label>Value:</label>
               <input type="text" onChange={this.handleChange} name="value"  className="form-control"/>
@@ -95,7 +100,7 @@ export default class Entry extends React.Component {
                 value={this.state.tag}
                 onChange={this.handleTagChange}
                 onSelect={this.addTag}
-                onKeyPress={this.handleAddTag}
+                inputProps={{onKeyPress: this.onKeyPress}}
               />
             </div>
 
