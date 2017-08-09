@@ -21,7 +21,7 @@ export default class Transaction extends React.Component {
         - name
         - date
         - value
-        - tags
+        - tags []
        */
       locations: {
         apple: {
@@ -41,21 +41,19 @@ export default class Transaction extends React.Component {
         },
       },
       tagList: [
-        { label: "Chocolate"},
-        { label: "Fast Food"},
-        { label: "Groceries"}
+        "Chocolate",
+        "Fast Food",
+        "Groceries"
       ],
       nicknames: [
-        { label: 'apple' },
-        { label: 'banana' },
-        { label: 'pear' }
+        'apple',
+        'banana',
+        'pear'
       ]
     };
     this.handleAddEntry = this.handleAddEntry.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleEntryEvent = this.handleEntryEvent.bind(this)
-
-
+    this.handleEntryEvent = this.handleEntryEvent.bind(this);
   }
 
 
@@ -111,15 +109,11 @@ export default class Transaction extends React.Component {
   }
 
   addEntryTag(id, tag){
-    console.log("Add tag: " + tag + " to ID " + id);
-    var key = "tags";
     this.setState((state,props) => {
-      var tags = state.entries[id][key].slice();
-      tags.push(tag);
-      var updateEntry = Object.assign(state.entries[id], {[key]: tags})
-      var entriesUpdate = { [id]: updateEntry }
+      var entries = state.entries
+      entries[id].tags.push(tag);
       return {
-        entries: entriesUpdate
+        entries: entries
       }
     })
 
@@ -139,6 +133,17 @@ export default class Transaction extends React.Component {
     //TODO Show succes or not
   }
 
+  deleteTag(id, tag){
+    this.setState((state,props) => {
+      var entries = state.entries
+      var index = entries[id].tags.findIndex(function(el){return el === tag})
+      entries[id].tags.splice(index,1);
+      return {
+        entries: entries
+      }
+    })
+  }
+
   render() {
     var entries = []
     for(var i = 0; i < this.state.numberOfEntries; i++) {
@@ -146,8 +151,9 @@ export default class Transaction extends React.Component {
         key={i+1}
         entryChange={this.handleEntryEvent}
         id={i+1}
-        tagList={this.state.tagList}
+        suggestions={this.state.tagList}
         newTag={this.addEntryTag.bind(this, i+1)}
+        deleteTag={this.deleteTag.bind(this, i+1)}
         />)
     }
     return (
@@ -157,12 +163,12 @@ export default class Transaction extends React.Component {
 
           <div className="form-group" className="vertical">
             <label>Name:</label>
-            <input type="text" onChange={this.handleChange.bind(this, "name")} name="Name" className="form-control"/>
+            <input type="text" onChange={this.handleChange.bind(this, "name")} name="Name" className="form-control react-tags"/>
           </div>
 
           <div className="form-group" className="vertical">
             <label>Date:</label>
-            <input type="text" onChange={this.handleChange.bind(this, "date")} name="Date" className="form-control"/>
+            <input type="text" onChange={this.handleChange.bind(this, "date")} name="Date" className="form-control react-tags"/>
           </div>
 
           <div className="form-group" className="vertical">
@@ -178,17 +184,18 @@ export default class Transaction extends React.Component {
               value={this.state.transactionData.nickname}
               onChange={this.handleChange.bind(this, "nickname")}
               onSelect={(val) => this.handleSelect("nickname", val)}
+              inputProps={{"className": "react-tags"}}
             />
           </div>
 
           <div className="form-group" className="vertical">
             <label>Location:</label>
-            <input value={this.state.transactionData.location} type="text" onChange={this.handleChange.bind(this, "location")} name="Location" className="form-control"/>
+            <input value={this.state.transactionData.location} type="text" onChange={this.handleChange.bind(this, "location")} name="Location" className="form-control react-tags"/>
           </div>
 
           <div className="form-group" className="vertical">
             <label>Town:</label>
-            <input type="text" value={this.state.transactionData.town} onChange={this.handleChange.bind(this, "town")} name="Town" className="form-control"/>
+            <input type="text" value={this.state.transactionData.town} onChange={this.handleChange.bind(this, "town")} name="Town" className="form-control react-tags"/>
           </div>
 
 

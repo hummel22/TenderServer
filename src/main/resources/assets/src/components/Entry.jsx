@@ -1,116 +1,79 @@
 import React from 'react';
 import Autocomplete from '../../node_modules/react-autocomplete/build/lib/index'
+import ReactTags from '../../node_modules/react-tag-autocomplete/'
+
 
 
 export default class Entry extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      myTags: "",   //Internal String list of tags to display
-      //TODO convert to array and create string list on fly - easier to delete later
-      tag: "" //Current value in the tag field
-    }
-
+          tags: [
+          ]
+        }
     this.handleChange = this.handleChange.bind(this);
-    this.handleAddTag = this.handleAddTag.bind(this);
-    this.addTag = this.addTag.bind(this);
-    this.selectTag = this.selectTag.bind(this);
-    this.handleTagChange = this.handleTagChange.bind(this);
-    this.onKeyPress = this.onKeyPress.bind(this);
   }
 
   handleChange(ev) {
     this.props.entryChange(this.props.id, ev);
   }
 
-  handleAddTag(ev){
-    console.log("PRESSED")
-    ev.persist()
-    if (ev.key === 'Enter') {
-     console.log('do validate');
-     console.log(ev.target.value);
-     addTag(ev.target.value)
-   }
+
+  handleDelete (i) {
+    const tags = this.state.tags.slice(0);
+    tags.splice(i, 1);
+    this.setState({ tags });
+    this.props.deleteTag(this.state.tags[i].name)
   }
 
-  addTag(val){
-    this.setState((state,props) => {
-      return {
-        myTags: this.state.myTags + ", " + val,
-        tag: ""
-      }
-    })
-    this.props.newTag(val);
+  handleAddition (tag) {
+    const tags = [].concat(this.state.tags, tag);
+    this.setState({ tags });
+    this.props.newTag(tag.name);
   }
 
-  selectTag(val) {
-    this.addTag(val)
-  }
 
-  handleTagChange(ev)  {
-    ev.persist();
-    this.setState((state,props) => {
-      return {
-        tag: ev.target.value
-      }
-    })
-  }
+    render() {
+        var suggestions = []
+        var index = 1
+        for(var sug in this.props.suggestions) {
+          suggestions.push({id: index++, name: this.props.suggestions[sug]})
+        }
+        return (
+          <div>
+            <div className="horizontal">
 
-  onKeyPress(ev) {
-    if(ev.key == 'Enter'){
-      this.addTag(ev.target.value)
+              <p>{this.props.id}</p>
+
+              <div className="form-group" className="vertical">
+                <label>Name:</label>
+                <input type="text" onChange={this.handleChange} name="name"  className="form-control react-tags"/>
+              </div>
+
+              <div className="form-group" className="vertical">
+                <label>Date:</label>
+                <input type="text" onChange={this.handleChange} name="date"  className="form-control react-tags"/>
+              </div>
+
+              <div className="form-group" className="vertical">
+                <label>Value:</label>
+                <input type="text" onChange={this.handleChange} name="value"  className="form-control react-tags"/>
+              </div>
+
+              <div className="form-group" className="vertical">
+                <label>Add Tag:</label>
+                <ReactTags
+                  tags={this.state.tags}
+                  suggestions={suggestions}
+                  handleDelete={this.handleDelete.bind(this)}
+                  handleAddition={this.handleAddition.bind(this)}
+                  allowNew={true}
+                  minQueryLength={0}
+                />
+              </div>
+
+            </div>
+          </div>
+        )
     }
   }
-
-
-  render() {
-      return (
-        <div>
-          <div className="horizontal">
-
-            <p>{this.props.id}</p>
-
-            <div className="form-group" className="vertical">
-              <label>Name:</label>
-              <input type="text" onChange={this.handleChange} name="name"  className="form-control"/>
-            </div>
-
-
-            <div className="form-group" className="vertical">
-              <label>Date:</label>
-              <input type="text" onChange={this.handleChange} name="date"  className="form-control"/>
-            </div>
-
-            <div className="form-group" className="vertical">
-              <label>Value:</label>
-              <input type="text" onChange={this.handleChange} name="value"  className="form-control"/>
-            </div>
-
-            <div className="form-group" className="vertical">
-              <label>Add Tag:</label>
-              <Autocomplete
-                name="tag"
-                getItemValue={(item) => item.label}
-                items={this.props.tagList}
-                renderItem={(item, isHighlighted) =>
-                  <div style={{ background: isHighlighted ? 'lightgray' : 'white' }}>
-                    {item.label}
-                  </div>
-                }
-                value={this.state.tag}
-                onChange={this.handleTagChange}
-                onSelect={this.addTag}
-                inputProps={{onKeyPress: this.onKeyPress}}
-              />
-            </div>
-
-            <div className="form-group" className="vertical">
-              <label>Tags:</label>
-              <p>{this.state.myTags}</p>
-            </div>
-
-          </div>
-        </div>
-      )
-  }
-}
