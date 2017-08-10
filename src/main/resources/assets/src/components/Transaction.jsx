@@ -5,6 +5,13 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
 import Card from 'material-ui/Card';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+
+
+
+const numberWidth = 55;
+const textWidth = 75;
 
 
 const textFieldled = {
@@ -19,6 +26,18 @@ const style = {
 
 const listStyle = {
   maxWidth: 75
+}
+
+
+
+const textFieldledNum = {
+  maxWidth: numberWidth,
+  marginLeft: 12,
+  marginRight: 12
+}
+
+const listStyleNum = {
+  maxWidth: numberWidth
 }
 
 const buttonStyle = {
@@ -37,13 +56,12 @@ export default class Transaction extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-
       transactionData: {
         name: "",
         date: "",
-        year: 17,
-        month: 1,
-        day: 23,
+        year: -1,
+        month: -1,
+        day: -1,
         nickname: "",
         location: "",
         town: ""},
@@ -96,15 +114,13 @@ export default class Transaction extends React.Component {
       //TODO Populate locations
 
   handleAddEntry()  {
-    console.log("Adding Entry")
     this.setState((state,props) => {
     var entriesUpdate = state.numberOfEntries + 1;
       return {
         numberOfEntries: entriesUpdate,
         entries: Object.assign(state.entries, {[entriesUpdate]:{
           name: "",
-          date: "",
-          value: -0.1,
+          value: -1,
           tags: []
         }})
       }
@@ -117,7 +133,6 @@ export default class Transaction extends React.Component {
   }
 
   updateTransactionData(key, val) {
-    console.log("Update: " + key + " : " + val);
     this.setState((state,props) => {
       return {transactionData: Object.assign(state.transactionData, {[key]: val})}
     })
@@ -132,10 +147,8 @@ export default class Transaction extends React.Component {
         town: location.town
       })}
     })
-    if(this.refs.entryButton) {
-      this.refs.entryButton.select();
-    } else {
-      console.log("Cant dfind ref")
+    if(this.state.numberOfEntries < 1)  {
+      this.handleAddEntry();
     }
   }
 
@@ -163,18 +176,110 @@ export default class Transaction extends React.Component {
 
   }
 
-  handleSubmit() {
-    console.log(this.state);
-    //TODO Verify Transaction
-    //TODO Verify entries
-      //TODO Convert Tags to Array
-    //TODO throw erroes
+  verifyEntry(entry)  {
+    if(entry.name === "") {
+      throw("No Entry name set")
+    }
+    if(parseInt(entry.value) === -1)  {
+      throw("No Entry value set")
+    }
+  }
 
-    //TODO Send Transaction
-      //TODO Get transaction ID
-    //TODO for loop
-      //TODO send entries with ID
-    //TODO Show succes or not
+  verifyTransaction(transaction){
+
+    if(transaction.name === "") {
+      throw("No transaction name set")
+    }
+    if(parseInt(transaction.year) === -1)  {
+      throw("No transaction year set")
+    }
+
+    if(parseInt(transaction.month) === -1) {
+      throw("No transaction month set")
+    }
+
+    if(parseInt(transaction.day) === -1) {
+      throw("No transaction day set")
+    }
+
+    if(transaction.nickname === "")  {
+      throw("No transaction nickname set")
+    }
+
+    if(transaction.location === "")  {
+      throw("No transaction location set")
+    }
+
+    if(transaction.town === "")  {
+      throw("No transaction town set")
+    }
+    var month = transaction.month
+    if(parseInt(transaction.month) < 10)  {
+      month = "0" + transaction.month;
+    }
+    var day = transaction.day
+    if(parseInt(transaction.day) < 10)  {
+      day = "0" + transaction.day;
+    }
+    return Object.assign(transaction, {date: "20"+transaction.year+"-"+month+"-"+day})
+  }
+
+  sendTransaction(transaction)  {
+    var data = {
+
+    }
+    return 24
+  }
+
+  sendEntry(entry)  {
+    var data = {
+
+    }
+  }
+
+  handleSubmit() {
+    try{
+      var transaction = this.verifyTransaction(this.state.transactionData);
+      for(var index in this.state.entries) {
+        this.verifyEntry(this.state.entries[index])
+        console.log(JSON.stringify(this.state.entries[index],null,2));
+
+      }
+    } catch(err)  {
+      console.log(err);
+      //TODO notification
+      throw err;
+    }
+
+    //TODO spinny loader
+    console.log(JSON.stringify(transaction,null,2));
+
+
+    try{
+      //Stop spinny
+      var id = this.sendTransaction(transaction);
+      //CheckMark Spinny
+    } catch(err)  {
+      console.log(err);
+      //Stop spinny
+      //TODO notification
+      throw err;
+    }
+
+    try{
+      //Stop spinny
+      for(var index in this.state.entries)  {
+        this.sendEntry(this.state.entries[index], id);
+      }
+      //CheckMark Spinny
+    } catch(err)  {
+      console.log(err);
+      //Stop spinny
+      //TODO notification
+      throw err;
+    }
+
+    //Success Notify
   }
 
   deleteTag(id, tag){
@@ -229,44 +334,29 @@ export default class Transaction extends React.Component {
             name="Name"
             style={textFieldled} />
 
-          <AutoComplete
-            id="YearTextField"
-            hintText="Year"
-            dataSource={[15,16,17]}
-            maxSearchResults={3}
-            menuStyle={listStyle}
-            listStyle={listStyle}
-            style={textFieldled}
-            textFieldStyle	={textFieldled}
-            openOnFocus={true}
-            onUpdateInput={this.updateTransactionData.bind(this, "year")}
-            onNewRequest={(val, index) => {if(index > -1) {this.handleSelect("year", val)}}}/>
+            <TextField
+              id="YearTextField"
+              type="number"
+              hintText="Year"
+              onChange={this.handleChange.bind(this, "year")}
+              name="Year"
+              style={textFieldledNum} />
 
-          <AutoComplete
-            id="MonthTextField"
-            hintText="Month"
-            dataSource={[1,2,3,4,5,6,7,8,9,10,11,12]}
-            maxSearchResults={12}
-            menuStyle={listStyle}
-            listStyle={listStyle}
-            style={textFieldled}
-            textFieldStyle	={textFieldled}
-            openOnFocus={true}
-            onUpdateInput={this.updateTransactionData.bind(this, "month")}
-            onNewRequest={(val, index) => {if(index > -1) {this.handleSelect("month", val)}}}/>
+              <TextField
+                id="MonthTextField"
+                type="number"
+                hintText="Month"
+                onChange={this.handleChange.bind(this, "month")}
+                name="Month"
+                style={textFieldledNum} />
 
-          <AutoComplete
-            id="DayTextField"
-            hintText="Day"
-            dataSource={[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]}
-            maxSearchResults={6}
-            menuStyle={listStyle}
-            listStyle={listStyle}
-            style={textFieldled}
-            textFieldStyle	={textFieldled}
-            openOnFocus={true}
-            onUpdateInput={this.updateTransactionData.bind(this, "day")}
-            onNewRequest={(val, index) => {if(index > -1) {this.handleSelect("day", val)}}}/>
+                <TextField
+                  id="DayTextField"
+                  type="number"
+                  hintText="Day"
+                  onChange={this.handleChange.bind(this, "day")}
+                  name="Day"
+                  style={textFieldledNum} />
 
 
           <AutoComplete
@@ -302,13 +392,12 @@ export default class Transaction extends React.Component {
             name="Town"
             style={textFieldled}/>
 
-            <RaisedButton
-              id="NewEntryButton"
-              onClick={this.handleAddEntry}
-              label="Entry"
-              primary={true}
+            <FloatingActionButton
+              mini={true}
               style={buttonStyle}
-              ref='entryButton'/>
+              onClick={this.handleAddEntry}>
+              <ContentAdd />
+            </FloatingActionButton>
 
         </div>
 

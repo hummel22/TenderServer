@@ -6,14 +6,16 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 import ChipInput from 'material-ui-chip-input';
 import AutoComplete from 'material-ui/AutoComplete';
 
+
+const width = 100;
 const textFieldled = {
-  maxWidth: 75,
+  maxWidth: width,
   marginLeft: 12,
   marginRight: 12
 }
 
 const listStyle = {
-  maxWidth: 75
+  maxWidth: width
 }
 
 const style = {
@@ -76,7 +78,7 @@ export default class Entry extends React.Component {
           ref='nameField'/>
 
         <TextField
-          type="text"
+          type="number"
           hintText="Value"
           onChange={this.handleChange}
           name="value"
