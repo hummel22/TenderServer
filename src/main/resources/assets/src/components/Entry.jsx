@@ -1,16 +1,40 @@
 import React from 'react';
-import Autocomplete from '../../node_modules/react-autocomplete/build/lib/index'
-import ReactTags from '../../node_modules/react-tag-autocomplete/'
+import ReactTags from 'react-tag-autocomplete';
+import TextField from 'material-ui/TextField';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+import ChipInput from 'material-ui-chip-input';
+import AutoComplete from 'material-ui/AutoComplete';
 
+const textFieldled = {
+  maxWidth: 75,
+  marginLeft: 12,
+  marginRight: 12
+}
 
+const listStyle = {
+  maxWidth: 75
+}
+
+const style = {
+  marginLeft: 12,
+  marginRight: 12
+};
+
+const buttonStyle = {
+  marginLeft: 12,
+  marginRight: 12,
+  marginBottom: 12,
+  marginTop: 12
+};
 
 export default class Entry extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-          tags: [
-          ]
-        }
+      tags: [
+      ]
+    }
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -32,48 +56,51 @@ export default class Entry extends React.Component {
     this.props.newTag(tag.name);
   }
 
-
-    render() {
-        var suggestions = []
-        var index = 1
-        for(var sug in this.props.suggestions) {
-          suggestions.push({id: index++, name: this.props.suggestions[sug]})
-        }
-        return (
-          <div>
-            <div className="horizontal">
-
-              <p>{this.props.id}</p>
-
-              <div className="form-group" className="vertical">
-                <label>Name:</label>
-                <input type="text" onChange={this.handleChange} name="name"  className="form-control react-tags"/>
-              </div>
-
-              <div className="form-group" className="vertical">
-                <label>Date:</label>
-                <input type="text" onChange={this.handleChange} name="date"  className="form-control react-tags"/>
-              </div>
-
-              <div className="form-group" className="vertical">
-                <label>Value:</label>
-                <input type="text" onChange={this.handleChange} name="value"  className="form-control react-tags"/>
-              </div>
-
-              <div className="form-group" className="vertical">
-                <label>Add Tag:</label>
-                <ReactTags
-                  tags={this.state.tags}
-                  suggestions={suggestions}
-                  handleDelete={this.handleDelete.bind(this)}
-                  handleAddition={this.handleAddition.bind(this)}
-                  allowNew={true}
-                  minQueryLength={0}
-                />
-              </div>
-
-            </div>
-          </div>
-        )
-    }
+  componentDidMount() {
+    this.refs.nameField.focus();
   }
+
+
+  render() {
+    return (
+      <div className="entry-container">
+        <TextField
+          type="text"
+          hintText="Name"
+          onChange={this.handleChange}
+          name="name"
+          menuStyle={listStyle}
+          listStyle={listStyle}
+          style={textFieldled}
+          textFieldStyle	={textFieldled}
+          ref='nameField'/>
+
+        <TextField
+          type="text"
+          hintText="Value"
+          onChange={this.handleChange}
+          name="value"
+          menuStyle={listStyle}
+          listStyle={listStyle}
+          style={textFieldled}
+          textFieldStyle	={textFieldled}/>
+
+        <ChipInput
+          newChipKeyCodes={[13, 188, 32]}
+          openOnFocus={true}
+          maxSearchResults={6}
+          filter={AutoComplete.caseInsensitiveFilter}
+          id={"TagInput" + this.props.id}
+          hintText="Tags"
+          dataSource={this.props.suggestions}
+          value={this.state.tags}
+          onRequestAdd={this.handleAddition.bind(this)}
+          onRequestDelete={(chip, index) => this.handleDelete(index)}/>
+
+        <FloatingActionButton mini={true} style={buttonStyle} onClick={this.props.addEntry}>
+          <ContentAdd />
+        </FloatingActionButton>
+      </div>
+    )
+  }
+}

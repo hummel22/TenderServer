@@ -1,15 +1,49 @@
 import React from 'react';
 import Entry from './Entry.jsx';
-import Autocomplete from '../../node_modules/react-autocomplete/build/lib/index'
+import AutoComplete from 'material-ui/AutoComplete';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
+import DatePicker from 'material-ui/DatePicker';
+import Card from 'material-ui/Card';
 
+
+const textFieldled = {
+  maxWidth: 75,
+  marginLeft: 12,
+  marginRight: 12
+}
+const style = {
+  marginLeft: 12,
+  marginRight: 12
+};
+
+const listStyle = {
+  maxWidth: 75
+}
+
+const buttonStyle = {
+  marginLeft: 12,
+  marginRight: 12,
+  marginBottom: 12
+}
+
+const bottom = {
+  marginTop: 55,
+  marginLeft: 12,
+  marginRight: 12
+};
 
 export default class Transaction extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+
       transactionData: {
         name: "",
         date: "",
+        year: 17,
+        month: 1,
+        day: 23,
         nickname: "",
         location: "",
         town: ""},
@@ -79,8 +113,13 @@ export default class Transaction extends React.Component {
 
   handleChange(key, ev) {
     ev.persist()
+    this.updateTransactionData(key, ev.target.value);
+  }
+
+  updateTransactionData(key, val) {
+    console.log("Update: " + key + " : " + val);
     this.setState((state,props) => {
-      return {transactionData: Object.assign(state.transactionData, {[key]: ev.target.value})}
+      return {transactionData: Object.assign(state.transactionData, {[key]: val})}
     })
   }
 
@@ -93,6 +132,11 @@ export default class Transaction extends React.Component {
         town: location.town
       })}
     })
+    if(this.refs.entryButton) {
+      this.refs.entryButton.select();
+    } else {
+      console.log("Cant dfind ref")
+    }
   }
 
   handleEntryEvent(id, ev) {
@@ -144,6 +188,19 @@ export default class Transaction extends React.Component {
     })
   }
 
+  // <TextField
+  //   id="DateTextField"
+  //   type="text"
+  //   hintText="Date"
+  //   onChange={this.handleChange.bind(this, "date")}
+  //   name="Date"
+  //   style={style}/>
+
+  // <DatePicker
+  //    hintText="Portrait Dialog"
+  //    style={style}
+  //    onChange={(val, date) => this.handleChange("date", date)}/>
+
   render() {
     var entries = []
     for(var i = 0; i < this.state.numberOfEntries; i++) {
@@ -154,60 +211,116 @@ export default class Transaction extends React.Component {
         suggestions={this.state.tagList}
         newTag={this.addEntryTag.bind(this, i+1)}
         deleteTag={this.deleteTag.bind(this, i+1)}
+        addEntry={this.handleAddEntry}
         />)
     }
     return (
-      <div>
-      <form>
+      <div className="center">
+      <Card className="main-card">
+      <div className="vertical">
+
         <div className="horizontal">
 
-          <div className="form-group" className="vertical">
-            <label>Name:</label>
-            <input type="text" onChange={this.handleChange.bind(this, "name")} name="Name" className="form-control react-tags"/>
-          </div>
+          <TextField
+            id="NameTextField"
+            type="text"
+            hintText="Name"
+            onChange={this.handleChange.bind(this, "name")}
+            name="Name"
+            style={textFieldled} />
 
-          <div className="form-group" className="vertical">
-            <label>Date:</label>
-            <input type="text" onChange={this.handleChange.bind(this, "date")} name="Date" className="form-control react-tags"/>
-          </div>
+          <AutoComplete
+            id="YearTextField"
+            hintText="Year"
+            dataSource={[15,16,17]}
+            maxSearchResults={3}
+            menuStyle={listStyle}
+            listStyle={listStyle}
+            style={textFieldled}
+            textFieldStyle	={textFieldled}
+            openOnFocus={true}
+            onUpdateInput={this.updateTransactionData.bind(this, "year")}
+            onNewRequest={(val, index) => {if(index > -1) {this.handleSelect("year", val)}}}/>
 
-          <div className="form-group" className="vertical">
-            <label>NickName:</label>
-            <Autocomplete
-              getItemValue={(item) => item.label}
-              items={this.state.nicknames}
-              renderItem={(item, isHighlighted) =>
-                <div style={{ background: isHighlighted ? 'lightgray' : 'white' }}>
-                  {item.label}
-                </div>
-              }
-              value={this.state.transactionData.nickname}
-              onChange={this.handleChange.bind(this, "nickname")}
-              onSelect={(val) => this.handleSelect("nickname", val)}
-              inputProps={{"className": "react-tags"}}
+          <AutoComplete
+            id="MonthTextField"
+            hintText="Month"
+            dataSource={[1,2,3,4,5,6,7,8,9,10,11,12]}
+            maxSearchResults={12}
+            menuStyle={listStyle}
+            listStyle={listStyle}
+            style={textFieldled}
+            textFieldStyle	={textFieldled}
+            openOnFocus={true}
+            onUpdateInput={this.updateTransactionData.bind(this, "month")}
+            onNewRequest={(val, index) => {if(index > -1) {this.handleSelect("month", val)}}}/>
+
+          <AutoComplete
+            id="DayTextField"
+            hintText="Day"
+            dataSource={[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]}
+            maxSearchResults={6}
+            menuStyle={listStyle}
+            listStyle={listStyle}
+            style={textFieldled}
+            textFieldStyle	={textFieldled}
+            openOnFocus={true}
+            onUpdateInput={this.updateTransactionData.bind(this, "day")}
+            onNewRequest={(val, index) => {if(index > -1) {this.handleSelect("day", val)}}}/>
+
+
+          <AutoComplete
+              id="NickNameTextField"
+              hintText="NickName"
+              filter={AutoComplete.caseInsensitiveFilter}
+              dataSource={this.state.nicknames}
+              maxSearchResults={6}
+              menuStyle={listStyle}
+              listStyle={listStyle}
+              style={textFieldled}
+              textFieldStyle	={textFieldled}
+              openOnFocus={true}
+              onUpdateInput={this.updateTransactionData.bind(this, "nickname")}
+              onNewRequest={(val, index) => {if(index > -1) {this.handleSelect("nickname", val)}}}
             />
-          </div>
 
-          <div className="form-group" className="vertical">
-            <label>Location:</label>
-            <input value={this.state.transactionData.location} type="text" onChange={this.handleChange.bind(this, "location")} name="Location" className="form-control react-tags"/>
-          </div>
+          <TextField
+            id="LocationTextField"
+            value={this.state.transactionData.location}
+            type="text"
+            hintText="Location"
+            onChange={this.handleChange.bind(this, "location")}
+            name="Location"
+            style={textFieldled}/>
 
-          <div className="form-group" className="vertical">
-            <label>Town:</label>
-            <input type="text" value={this.state.transactionData.town} onChange={this.handleChange.bind(this, "town")} name="Town" className="form-control react-tags"/>
-          </div>
+          <TextField
+            id="TownTextField"
+            type="text"
+            hintText="Town"
+            value={this.state.transactionData.town}
+            onChange={this.handleChange.bind(this, "town")}
+            name="Town"
+            style={textFieldled}/>
 
+            <RaisedButton
+              id="NewEntryButton"
+              onClick={this.handleAddEntry}
+              label="Entry"
+              primary={true}
+              style={buttonStyle}
+              ref='entryButton'/>
 
-
-
-          <button type="button" onClick={this.handleSubmit} className="btn btn-primary">Submit</button>
-          <button type="button" onClick={this.handleAddEntry} className="btn btn-primary">Add Entry</button>
         </div>
-        </form>
 
         {entries.map(entry => (entry))}
 
+        <RaisedButton
+          onClick={this.handleSubmit}
+          label="Submit"
+          primary={true}
+          style={bottom}/>
+      </div>
+      </Card>
       </div>
     );
   }
