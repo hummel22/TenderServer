@@ -103,6 +103,7 @@ export default class Transaction extends React.Component {
         'pear'
       ]
     };
+    this.baseState= this.state;
     this.handleAddEntry = this.handleAddEntry.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleEntryEvent = this.handleEntryEvent.bind(this);
@@ -237,6 +238,13 @@ export default class Transaction extends React.Component {
     }
   }
 
+  clear() {
+    this.setState((state,props) => {
+      return this.baseState
+    });
+  }
+
+
   handleSubmit() {
     try{
       var transaction = this.verifyTransaction(this.state.transactionData);
@@ -280,6 +288,7 @@ export default class Transaction extends React.Component {
     }
 
     //Success Notify
+    this.clear();
   }
 
   deleteTag(id, tag){

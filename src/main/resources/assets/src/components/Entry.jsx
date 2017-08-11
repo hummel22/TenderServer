@@ -55,7 +55,7 @@ export default class Entry extends React.Component {
   handleAddition (tag) {
     const tags = [].concat(this.state.tags, tag);
     this.setState({ tags });
-    this.props.newTag(tag.name);
+    this.props.newTag(tag);
   }
 
   componentDidMount() {
