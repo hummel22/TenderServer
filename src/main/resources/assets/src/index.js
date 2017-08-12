@@ -3,7 +3,7 @@
 */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Transaction from './components/Transaction.jsx';
+import TransactionForm from './components/TransactionForm.jsx';
 
 //Material - UI
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -17,12 +17,29 @@ injectTapEventPlugin();
 
 
 //Wrap React Component with material-ui Theme provider
-const App = () => (
-  <MuiThemeProvider>
-    <Transaction />
-  </MuiThemeProvider>
-);
 
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      uniqueID: 0
+    }
+    this.reset = this.resetForm.bind(this);
+  }
+  resetForm() {
+    console.log("Updateing ID")
+    this.setState((state,props) => {
+      return {uniqueID: this.state.uniqueID+1}
+    })
+  }
+  render() {
+    return (
+      <MuiThemeProvider key={this.state.uniqueID}>
+        <TransactionForm  reset={this.reset}/>
+      </MuiThemeProvider>
+    )
+  }
+}
 
 ReactDOM.render(
   <App />,
