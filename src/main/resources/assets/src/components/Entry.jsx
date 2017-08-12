@@ -3,6 +3,7 @@ import ReactTags from 'react-tag-autocomplete';
 import TextField from 'material-ui/TextField';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import ContentRemove from 'material-ui/svg-icons/content/remove';
 import ChipInput from 'material-ui-chip-input';
 import AutoComplete from 'material-ui/AutoComplete';
 
@@ -64,6 +65,16 @@ export default class Entry extends React.Component {
 
 
   render() {
+    var addButton;
+    if(this.props.deleteMode)  {
+      addButton = <FloatingActionButton mini={true} secondary={true} style={buttonStyle} onClick={this.props.removeEntry}>
+                <ContentRemove />
+              </FloatingActionButton>
+    } else {
+      addButton = <FloatingActionButton mini={true}   style={buttonStyle} onClick={this.props.addEntry}>
+                    <ContentAdd />
+                  </FloatingActionButton>
+    }
     return (
       <div className="entry-container">
         <TextField
@@ -75,7 +86,9 @@ export default class Entry extends React.Component {
           listStyle={listStyle}
           style={textFieldled}
           textFieldStyle	={textFieldled}
-          ref='nameField'/>
+          ref='nameField'
+          onFocus={this.props.disableDeleteMode}
+          onBlur={this.props.enableDeleteMode}/>
 
         <TextField
           type="number"
@@ -85,7 +98,9 @@ export default class Entry extends React.Component {
           menuStyle={listStyle}
           listStyle={listStyle}
           style={textFieldled}
-          textFieldStyle	={textFieldled}/>
+          textFieldStyle	={textFieldled}
+          onFocus={this.props.disableDeleteMode}
+          onBlur={this.props.enableDeleteMode}/>
 
         <ChipInput
           newChipKeyCodes={[13, 188, 32]}
@@ -97,11 +112,11 @@ export default class Entry extends React.Component {
           dataSource={this.props.suggestions}
           value={this.state.tags}
           onRequestAdd={this.handleAddition.bind(this)}
-          onRequestDelete={(chip, index) => this.handleDelete(index)}/>
+          onRequestDelete={(chip, index) => this.handleDelete(index)}
+          onFocus={this.props.disableDeleteMode}
+          onBlur={this.props.enableDeleteMode}/>
 
-        <FloatingActionButton mini={true} style={buttonStyle} onClick={this.props.addEntry}>
-          <ContentAdd />
-        </FloatingActionButton>
+        {addButton}
       </div>
     )
   }

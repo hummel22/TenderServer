@@ -8,6 +8,7 @@ import Card from 'material-ui/Card';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Transaction from './Transaction.jsx'
+var omit = require('object.omit');
 
 
 
@@ -68,6 +69,7 @@ export default class TransactionForm extends React.Component {
         town: ""},
       transactionID: null,
       numberOfEntries: 0,
+      nextEntryID: 0,
       entries: {},
       /*
        Entires have data like
@@ -102,14 +104,30 @@ export default class TransactionForm extends React.Component {
         'apple',
         'banana',
         'pear'
-      ]
+      ],
+      shiftDown: false
     };
     this.baseState= JSON.parse(JSON.stringify(this.state));
     this.handleAddEntry = this.handleAddEntry.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleEntryEvent = this.handleEntryEvent.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.shiftMode = true;
+    this.keyDown = this.keyDown.bind(this)
+    this.keyUp = this.keyUp.bind(this)
   }
+
+  componentDidMount() {
+    window.addEventListener("keydown", this.keyDown);
+    window.addEventListener("keyup", this.keyUp);
+  }
+
+  componentWillUnmount()  {
+    window.removeEventListener("keydown", this.keyDown);
+    window.removeEventListener("keyup", this.keyUp);
+  }
+
+
 
 
   //TODO updateTagsAndLocations
@@ -119,9 +137,11 @@ export default class TransactionForm extends React.Component {
   handleAddEntry()  {
     this.setState((state,props) => {
     var entriesUpdate = state.numberOfEntries + 1;
+    var nextEntryID = state.nextEntryID + 1;
       return {
         numberOfEntries: entriesUpdate,
-        entries: Object.assign(state.entries, {[entriesUpdate]:{
+        nextEntryID: nextEntryID,
+        entries: Object.assign(state.entries, {[nextEntryID]:{
           name: "",
           value: -1,
           tags: []
@@ -161,9 +181,9 @@ export default class TransactionForm extends React.Component {
     this.setState((state,props) => {
       var updateKey = {[key]: ev.target.value};
       var updateEntry = Object.assign(state.entries[id], updateKey)
-      var entriesUpdate = { [id]: updateEntry }
+      var entriesUpdate = Object.assign(state.entries, { [id]: updateEntry })
       return {
-        entries: entriesUpdate
+        entriesUpdate
       }
     })
   }
@@ -302,6 +322,46 @@ export default class TransactionForm extends React.Component {
     })
   }
 
+
+  keyDown(ev) {
+    if(this.shiftMode) {
+      if(ev.key==="Shift")  {
+        this.setState((state,props) => {
+          return {shiftDown:true}
+        })
+      }
+    }
+  }
+
+
+    keyUp(ev) {
+      if(ev.key==="Shift")  {
+        this.setState((state,props) => {
+          return {shiftDown:false}
+        })
+      }
+    }
+
+
+    disableShift()  {
+      this.shiftMode = false;
+    }
+
+    enableShift() {
+      this.shiftMode = true;
+    }
+
+    removeEntry(id) {
+      console.log("Remove: " +id)
+      this.setState((state,props) => {
+        return {
+          numberOfEntries: this.state.numberOfEntries - 1,
+          entries: omit(this.state.entries, id)
+        }
+      })
+    }
+
+
   // <TextField
   //   id="DateTextField"
   //   type="text"
@@ -317,19 +377,37 @@ export default class TransactionForm extends React.Component {
 
   render() {
     var entries = []
-    for(var i = 0; i < this.state.numberOfEntries; i++) {
+    for(var key in this.state.entries) {
       entries.push(<Entry
-        key={i+1}
+        key={key}
         entryChange={this.handleEntryEvent}
-        id={i+1}
+        id={key}
         suggestions={this.state.tagList}
-        newTag={this.addEntryTag.bind(this, i+1)}
-        deleteTag={this.deleteTag.bind(this, i+1)}
+        newTag={this.addEntryTag.bind(this, key)}
+        deleteTag={this.deleteTag.bind(this, key)}
         addEntry={this.handleAddEntry}
+        disableDeleteMode={this.disableShift.bind(this)}
+        enableDeleteMode={this.enableShift.bind(this)}
+        deleteMode={this.state.shiftDown}
+        removeEntry={this.removeEntry.bind(this, key)}
         />)
     }
+    var submitButton;
+    if(this.state.shiftDown)  {
+        submitButton = <RaisedButton
+          onClick={this.clear.bind(this)}
+          label="Reset"
+          secondary={true}
+          style={bottom}/>
+    } else {
+      submitButton = <RaisedButton
+        onClick={this.handleSubmit}
+        label="Submit"
+        primary={true}
+        style={bottom}/>
+    }
     return (
-      <div className="center">
+      <div className="center" >
         <Card className="main-card">
           <div className="vertical">
 
@@ -340,15 +418,14 @@ export default class TransactionForm extends React.Component {
               nicknames={this.state.nicknames}
               updateTransactionData={this.updateTransactionData.bind(this)}
               handleSelect={this.handleSelect.bind(this)}
-              handleAddEntry={this.handleAddEntry}/>
+              handleAddEntry={this.handleAddEntry}
+              disableDeleteMode={this.disableShift.bind(this)}
+              enableDeleteMode={this.enableShift.bind(this)}
+              />
 
             {entries.map(entry => (entry))}
 
-            <RaisedButton
-              onClick={this.handleSubmit}
-              label="Submit"
-              primary={true}
-              style={bottom}/>
+            {submitButton}
           </div>
         </Card>
       </div>

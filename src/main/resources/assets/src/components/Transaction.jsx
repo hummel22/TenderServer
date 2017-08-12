@@ -8,6 +8,7 @@ import Card from 'material-ui/Card';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
+
 const numberWidth = 55;
 const textWidth = 75;
 
@@ -66,7 +67,9 @@ export default class TransactionForm extends React.Component {
           onChange={(ev) => {this.props.handleChange("name", ev)}}
           name="Name"
           value={this.props.transactionData.name}
-          style={textFieldled} />
+          style={textFieldled}
+          onFocus={this.props.disableDeleteMode}
+          onBlur={this.props.enableDeleteMode} />
 
         <TextField
           id="YearTextField"
@@ -75,7 +78,9 @@ export default class TransactionForm extends React.Component {
           onChange={(ev) => {this.props.handleChange("year", ev)}}
           name="Year"
           value={this.props.transactionData.year}
-          style={textFieldledNum} />
+          style={textFieldledNum}
+          onFocus={this.props.disableDeleteMode}
+          onBlur={this.props.enableDeleteMode} />
 
         <TextField
           id="MonthTextField"
@@ -84,7 +89,9 @@ export default class TransactionForm extends React.Component {
           onChange={(ev) => {this.props.handleChange("month", ev)}}
           name="Month"
           value={this.props.transactionData.month}
-          style={textFieldledNum} />
+          style={textFieldledNum}
+          onFocus={this.props.disableDeleteMode}
+          onBlur={this.props.enableDeleteMode} />
 
         <TextField
           id="DayTextField"
@@ -93,7 +100,9 @@ export default class TransactionForm extends React.Component {
           onChange={(ev) =>{this.props.handleChange("day", ev)}}
           name="Day"
           value={this.props.transactionData.day}
-          style={textFieldledNum} />
+          style={textFieldledNum}
+          onFocus={this.props.disableDeleteMode}
+          onBlur={this.props.enableDeleteMode} />
 
 
         <AutoComplete
@@ -109,7 +118,9 @@ export default class TransactionForm extends React.Component {
           openOnFocus={true}
           searchText={this.props.transactionData.nickname}
           onUpdateInput={(val) => {this.props.updateTransactionData("nickname", val)} }
-          onNewRequest={(val, index) => {if(index > -1) {this.props.handleSelect("nickname", val)}}}/>
+          onNewRequest={(val, index) => {if(index > -1) {this.props.handleSelect("nickname", val)}}}
+          onFocus={this.props.disableDeleteMode}
+          onBlur={this.props.enableDeleteMode}/>
 
         <TextField
           id="LocationTextField"
@@ -118,7 +129,9 @@ export default class TransactionForm extends React.Component {
           hintText="Location"
           onChange={(ev) => this.props.handleChange("location", ev)}
           name="Location"
-          style={textFieldled}/>
+          style={textFieldled}
+          onFocus={this.props.disableDeleteMode}
+          onBlur={this.props.enableDeleteMode}/>
 
         <TextField
           id="TownTextField"
@@ -127,7 +140,9 @@ export default class TransactionForm extends React.Component {
           value={this.props.transactionData.town}
           onChange={(ev) => this.props.handleChange("town", ev)}
           name="Town"
-          style={textFieldled}/>
+          style={textFieldled}
+          onFocus={this.props.disableDeleteMode}
+          onBlur={this.props.enableDeleteMode}/>
 
         <FloatingActionButton
           mini={true}

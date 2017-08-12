@@ -32,9 +32,10 @@ class App extends React.Component {
       return {uniqueID: this.state.uniqueID+1}
     })
   }
+
   render() {
     return (
-      <MuiThemeProvider key={this.state.uniqueID}>
+      <MuiThemeProvider key={this.state.uniqueID} >
         <TransactionForm  reset={this.reset}/>
       </MuiThemeProvider>
     )
