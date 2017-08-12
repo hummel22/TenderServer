@@ -46,3 +46,4 @@ atlassian-ide-plugin.xml
 logs
 
 src/main/resources/assets/node_modules/
+.DS_Store
