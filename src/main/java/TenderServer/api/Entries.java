@@ -13,6 +13,12 @@ import java.util.Set;
 
 /**
  * Created by MBAIR on 7/25/17.
+ * {
+ "name": "Laundry Detergent Ice Soap",
+ "value": "27.86",
+ "transaction_id": "24",
+ "tags" : ["Icecream", "Cake", "FastFood"]
+ }
  */
 @Path("/entries")
 @Produces(MediaType.APPLICATION_JSON)

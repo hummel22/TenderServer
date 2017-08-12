@@ -78,33 +78,9 @@ export default class TransactionForm extends React.Component {
         - value
         - tags []
        */
-      locations: {
-        apple: {
-          nickname: "apple",
-          location: "Mcdonalds",
-          town: "NewYork"
-        },
-        banana: {
-          nickname: "banana",
-          location: "Wenyds",
-          town: "Vrginia"
-        },
-        pear: {
-          nickname: "pear",
-          location: "KFC",
-          town: "DC"
-        },
-      },
-      tagList: [
-        "Chocolate",
-        "Fast Food",
-        "Groceries"
-      ],
-      nicknames: [
-        'apple',
-        'banana',
-        'pear'
-      ],
+      locations: {},
+      tagList: [],
+      nicknames: [],
       shiftDown: false
     };
     this.baseState= JSON.parse(JSON.stringify(this.state));
@@ -113,18 +89,92 @@ export default class TransactionForm extends React.Component {
     this.handleEntryEvent = this.handleEntryEvent.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.shiftMode = true;
-    this.keyDown = this.keyDown.bind(this)
-    this.keyUp = this.keyUp.bind(this)
+    this.keyDown = this.keyDown.bind(this);
+    this.keyUp = this.keyUp.bind(this);
+    this.getTags = this.loadTags.bind(this);
+    this.getLocations = this.loadLocations.bind(this);
+
+
   }
 
   componentDidMount() {
     window.addEventListener("keydown", this.keyDown);
     window.addEventListener("keyup", this.keyUp);
+    this.getTags();
+    this.getLocations();
   }
 
   componentWillUnmount()  {
     window.removeEventListener("keydown", this.keyDown);
     window.removeEventListener("keyup", this.keyUp);
+  }
+
+  loadTags()  {
+    var tagURL = "http://127.0.0.1:8080/api/tags"
+    var saveTags = this.setStateTags.bind(this);
+    fetch(tagURL)
+      .then(function(data) {
+        data.json().then((body) =>
+        {
+          var tags = []
+          for(var index in body)  {
+            tags.push(body[index].name)
+          }
+          saveTags(tags)
+        })
+      })
+      .catch(function(error) {
+        // If there is any error you will catch them here
+        console.log("Error Fetching Tags: " + error)
+      });
+  }
+
+  setStateTags(tags) {
+    this.setState((state,props) =>  {
+      return { tagList : tags };
+    })
+  }
+
+
+  loadLocations () {
+    var locationURL = "http://127.0.0.1:8080/api/locations"
+    var saveLocations = this.setStateLocations.bind(this);
+    fetch(locationURL)
+      .then(function(data) {
+        console.log(data);
+        data.json().then((body) =>
+        {
+          console.log(body);
+          var nicknames = [];
+          var locations = {};
+          for(var index in body)  {
+            var location = body[index];
+            nicknames.push(location.nickname)
+            locations[location.nickname] =  {
+              nickname: location.nickname,
+              location: location.name,
+              town: location.town
+            };
+          }
+          saveLocations(locations, nicknames)
+        })
+      })
+      .catch(function(error) {
+        // If there is any error you will catch them here
+        console.log("Error Fetching Tags: " + error)
+      });
+  }
+
+  setStateLocations(locations, nicknames) {
+    console.log(JSON.stringify(locations,null,2));
+    console.log(JSON.stringify(nicknames,null,2));
+
+    this.setState((state,props) =>  {
+      return {
+        nicknames : nicknames,
+        locations : locations
+      };
+    })
   }
 
 
@@ -162,7 +212,9 @@ export default class TransactionForm extends React.Component {
   }
 
   handleSelect(key, val)  {
+    console.log("Selected: " + val)
     var location = this.state.locations[val]
+    console.log(JSON.stringify(location,null,2))
     this.setState((state,props) => {
       return {transactionData: Object.assign(state.transactionData, {
         nickname: location.nickname,
@@ -244,7 +296,16 @@ export default class TransactionForm extends React.Component {
     if(parseInt(transaction.day) < 10)  {
       day = "0" + transaction.day;
     }
-    return Object.assign(transaction, {date: "20"+transaction.year+"-"+month+"-"+day})
+    var body = {
+      name: transaction.name,
+      date: "20"+transaction.year+"-"+month+"-"+day,
+      location: {
+        name: transaction.name,
+        town:transaction.town,
+        nickname: transaction.nickname
+      }
+    }
+    return body;
   }
 
   sendTransaction(transaction)  {
@@ -270,7 +331,14 @@ export default class TransactionForm extends React.Component {
       var transaction = this.verifyTransaction(this.state.transactionData);
       for(var index in this.state.entries) {
         this.verifyEntry(this.state.entries[index])
-        console.log(JSON.stringify(this.state.entries[index],null,2));
+        var entry = this.state.entries[index];
+        var body = {
+          name: entry.name,
+          value: entry.value,
+          transaction_id: id,
+          tags: entry.tags
+        }
+        console.log(JSON.stringify(body,null,2));
 
       }
     } catch(err)  {
@@ -297,6 +365,13 @@ export default class TransactionForm extends React.Component {
     try{
       //Stop spinny
       for(var index in this.state.entries)  {
+        var entry = this.state.entries[index];
+        var body = {
+          name: entry.name,
+          value: entry.value,
+          transaction_id: id,
+          tags: entry.tags,
+        }
         this.sendEntry(this.state.entries[index], id);
       }
       //CheckMark Spinny

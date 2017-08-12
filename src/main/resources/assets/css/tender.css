@@ -2,7 +2,7 @@
 .horizontal {
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: space-around;
   -webkit-justify-content: center; /* Safari */
   justify-content:         center;
 }

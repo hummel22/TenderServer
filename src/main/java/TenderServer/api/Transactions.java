@@ -16,6 +16,21 @@ import java.util.List;
 
 /**
  * Created by MBAIR on 7/24/17.
+ *
+ *
+ * Transaction Data is forrmed as
+ *
+ *  application type: application/json
+ *
+ *  {
+ *    "name": "Wendys Valentines Date",
+ *    "date": "2017-06-08",
+ *    "location": {
+ *      "name": "Wendys",
+ *      "town": "Fairfax",
+ *      "nickname": "Travel-Spot"
+ *    }
+ *  }
  */
 
 @Path("/transactions")

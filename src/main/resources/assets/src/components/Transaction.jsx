@@ -11,6 +11,7 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 
 const numberWidth = 55;
 const textWidth = 75;
+const autoWidth = 125;
 
 
 const textFieldled = {
@@ -27,7 +28,27 @@ const listStyle = {
   maxWidth: 75
 }
 
+const autoListStyle = {
+  maxWidth: autoWidth,
+  marginRight: 12
+}
 
+const autoTextFieldled = {
+  maxWidth: autoWidth,
+  marginLeft: 12,
+  marginRight: 12
+}
+
+
+const locationTextFieldled = {
+  maxWidth: 125,
+  marginLeft: 32,
+  marginRight: 12
+}
+
+const autoCompleteStyle = {
+  maxWidth: autoWidth
+}
 
 const textFieldledNum = {
   maxWidth: numberWidth,
@@ -51,6 +72,8 @@ const bottom = {
   marginRight: 12
 };
 
+
+
 export default class TransactionForm extends React.Component {
   constructor(props) {
     super(props);
@@ -67,7 +90,7 @@ export default class TransactionForm extends React.Component {
           onChange={(ev) => {this.props.handleChange("name", ev)}}
           name="Name"
           value={this.props.transactionData.name}
-          style={textFieldled}
+          style={locationTextFieldled}
           onFocus={this.props.disableDeleteMode}
           onBlur={this.props.enableDeleteMode} />
 
@@ -111,10 +134,10 @@ export default class TransactionForm extends React.Component {
           filter={AutoComplete.caseInsensitiveFilter}
           dataSource={this.props.nicknames}
           maxSearchResults={6}
-          menuStyle={listStyle}
-          listStyle={listStyle}
-          style={textFieldled}
-          textFieldStyle={textFieldled}
+          menuStyle={autoListStyle}
+          listStyle={autoListStyle}
+          style={autoCompleteStyle}
+          textFieldStyle={autoTextFieldled}
           openOnFocus={true}
           searchText={this.props.transactionData.nickname}
           onUpdateInput={(val) => {this.props.updateTransactionData("nickname", val)} }
@@ -129,7 +152,7 @@ export default class TransactionForm extends React.Component {
           hintText="Location"
           onChange={(ev) => this.props.handleChange("location", ev)}
           name="Location"
-          style={textFieldled}
+          style={locationTextFieldled}
           onFocus={this.props.disableDeleteMode}
           onBlur={this.props.enableDeleteMode}/>
 
