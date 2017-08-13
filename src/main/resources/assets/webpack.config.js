@@ -13,6 +13,9 @@ module.exports = {
   resolve: {
     modules: [path.resolve(__dirname, './src'), './node_modules']
   },
+  devServer: {
+  contentBase: './'
+  },
   module: {
     loaders: [
       { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },

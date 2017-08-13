@@ -88,7 +88,8 @@ export default class Entry extends React.Component {
           textFieldStyle	={textFieldled}
           ref='nameField'
           onFocus={this.props.disableDeleteMode}
-          onBlur={this.props.enableDeleteMode}/>
+          onBlur={this.props.enableDeleteMode}
+          errorText={this.props.errorMsgs.name}/>
 
         <TextField
           type="number"
@@ -100,7 +101,8 @@ export default class Entry extends React.Component {
           style={textFieldled}
           textFieldStyle	={textFieldled}
           onFocus={this.props.disableDeleteMode}
-          onBlur={this.props.enableDeleteMode}/>
+          onBlur={this.props.enableDeleteMode}
+          errorText={this.props.errorMsgs.value}/>
 
         <ChipInput
           newChipKeyCodes={[13, 188, 32]}

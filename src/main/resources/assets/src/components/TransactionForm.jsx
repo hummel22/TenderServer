@@ -66,11 +66,13 @@ export default class TransactionForm extends React.Component {
         day: "",
         nickname: "",
         location: "",
-        town: ""},
+        town: "" },
+      transactionDataErrors: {},
       transactionID: null,
       numberOfEntries: 0,
       nextEntryID: 0,
       entries: {},
+      entriesErrors: {},
       /*
        Entires have data like
         - name
@@ -93,8 +95,6 @@ export default class TransactionForm extends React.Component {
     this.keyUp = this.keyUp.bind(this);
     this.getTags = this.loadTags.bind(this);
     this.getLocations = this.loadLocations.bind(this);
-
-
   }
 
   componentDidMount() {
@@ -141,10 +141,8 @@ export default class TransactionForm extends React.Component {
     var saveLocations = this.setStateLocations.bind(this);
     fetch(locationURL)
       .then(function(data) {
-        console.log(data);
         data.json().then((body) =>
         {
-          console.log(body);
           var nicknames = [];
           var locations = {};
           for(var index in body)  {
@@ -166,9 +164,6 @@ export default class TransactionForm extends React.Component {
   }
 
   setStateLocations(locations, nicknames) {
-    console.log(JSON.stringify(locations,null,2));
-    console.log(JSON.stringify(nicknames,null,2));
-
     this.setState((state,props) =>  {
       return {
         nicknames : nicknames,
@@ -195,6 +190,10 @@ export default class TransactionForm extends React.Component {
           name: "",
           value: -1,
           tags: []
+        }}),
+        entriesErrors: Object.assign(state.entriesErrors, {[nextEntryID]:{
+          name: null,
+          value: null,
         }})
       }
     });
@@ -212,9 +211,7 @@ export default class TransactionForm extends React.Component {
   }
 
   handleSelect(key, val)  {
-    console.log("Selected: " + val)
     var location = this.state.locations[val]
-    console.log(JSON.stringify(location,null,2))
     this.setState((state,props) => {
       return {transactionData: Object.assign(state.transactionData, {
         nickname: location.nickname,
@@ -252,42 +249,48 @@ export default class TransactionForm extends React.Component {
   }
 
   verifyEntry(entry)  {
+    var errors = {};
     if(entry.name === "") {
-      throw("No Entry name set")
+      errors["name"] = "Name Required";
     }
-    if(parseInt(entry.value) === -1)  {
-      throw("No Entry value set")
+    if(parseInt(entry.value) === -1 || entry.value ==="")  {
+      errors["value"] = "Value Required";
     }
+    return errors;
   }
 
   verifyTransaction(transaction){
-
+    var errors = {}
     if(transaction.name === "") {
-      throw("No transaction name set")
+      errors["name"] = "Name Required";
     }
-    if(parseInt(transaction.year) === -1)  {
-      throw("No transaction year set")
-    }
-
-    if(parseInt(transaction.month) === -1) {
-      throw("No transaction month set")
+    if(parseInt(transaction.year) === -1 || transaction.year === "")  {
+      errors["year"] = "Year Required 20[XX]";
     }
 
-    if(parseInt(transaction.day) === -1) {
-      throw("No transaction day set")
+    if(parseInt(transaction.month) === -1 || transaction.month === "") {
+      errors["month"] = "Month Required";
+    }
+
+    if(parseInt(transaction.day) === -1 || transaction.day === "") {
+      errors["day"] = "Day Required";
     }
 
     if(transaction.nickname === "")  {
-      throw("No transaction nickname set")
+      errors["nickname"] = "Name Required";
     }
 
     if(transaction.location === "")  {
-      throw("No transaction location set")
+      errors["location"] = "Name Required";
     }
 
     if(transaction.town === "")  {
-      throw("No transaction town set")
+      errors["town"] = "Name Required";
     }
+    return errors;
+  }
+
+  buildTransaction(transaction) {
     var month = transaction.month
     if(parseInt(transaction.month) < 10)  {
       month = "0" + transaction.month;
@@ -308,81 +311,93 @@ export default class TransactionForm extends React.Component {
     return body;
   }
 
-  sendTransaction(transaction)  {
-    var data = {
-
+  buildEntry(entry, id) {
+    return {
+      name: entry.name,
+      value: entry.value,
+      transaction_id: id,
+      tags: entry.tags
     }
-    return 24
+  }
+
+  sendTransaction(transaction)  {
+    this.prettyPrint(transaction);
+    return 24;
   }
 
   sendEntry(entry)  {
-    var data = {
+    this.prettyPrint(entry);
+  }
 
-    }
+
+  prettyPrint(obj)  {
+    console.log(JSON.stringify(obj, null, 2));
   }
 
   clear() {
     this.props.reset();
   }
 
+  checkEmpty(obj) {
+    return (Object.keys(obj).length === 0 && obj.constructor === Object)
+  }
+
+  hasErrors(transactionErrors, entryErrors) {
+    if(!this.checkEmpty(transactionErrors))  {
+      return true;
+    }
+    if(!this.checkEmpty(entryErrors)) {
+      for(var index in entryErrors)  {
+        if(!this.checkEmpty(entryErrors[index]))  {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
   handleSubmit() {
-    try{
-      var transaction = this.verifyTransaction(this.state.transactionData);
-      for(var index in this.state.entries) {
-        this.verifyEntry(this.state.entries[index])
-        var entry = this.state.entries[index];
-        var body = {
-          name: entry.name,
-          value: entry.value,
-          transaction_id: id,
-          tags: entry.tags
+    var transactionErrors = this.verifyTransaction(this.state.transactionData);
+    var entryErrors = {};
+    for(var index in this.state.entries) {
+      entryErrors[index] = this.verifyEntry(this.state.entries[index])
+    }
+
+    this.prettyPrint(transactionErrors);
+    this.prettyPrint(entryErrors);
+    console.log("Errors Tran: " + this.checkEmpty(transactionErrors));
+    console.log("Errors Entr: " + this.checkEmpty(entryErrors));
+    console.log("ERRORS: " + this.hasErrors(transactionErrors, entryErrors));
+
+    if(this.hasErrors(transactionErrors, entryErrors))  {
+      this.setState((state,props) => {
+        return {
+          transactionDataErrors: transactionErrors,
+          entriesErrors: entryErrors
         }
-        console.log(JSON.stringify(body,null,2));
-
-      }
-    } catch(err)  {
-      console.log(err);
-      //TODO notification
-      throw err;
+      })
+      throw "Missing Fields";
     }
 
-    //TODO spinny loader
-    console.log(JSON.stringify(transaction,null,2));
-
-
+    var id = null;
     try{
-      //Stop spinny
-      var id = this.sendTransaction(transaction);
-      //CheckMark Spinny
+      var transaction = this.buildTransaction(this.state.transactionData);
+      id = this.sendTransaction(transaction);
     } catch(err)  {
       console.log(err);
-      //Stop spinny
-      //TODO notification
       throw err;
     }
 
     try{
-      //Stop spinny
       for(var index in this.state.entries)  {
-        var entry = this.state.entries[index];
-        var body = {
-          name: entry.name,
-          value: entry.value,
-          transaction_id: id,
-          tags: entry.tags,
-        }
-        this.sendEntry(this.state.entries[index], id);
+        var entry = this.buildEntry(this.state.entries[index], id)
+        this.sendEntry(entry);
       }
-      //CheckMark Spinny
     } catch(err)  {
       console.log(err);
-      //Stop spinny
-      //TODO notification
       throw err;
     }
 
-    //Success Notify
     this.clear();
   }
 
@@ -427,11 +442,11 @@ export default class TransactionForm extends React.Component {
     }
 
     removeEntry(id) {
-      console.log("Remove: " +id)
       this.setState((state,props) => {
         return {
           numberOfEntries: this.state.numberOfEntries - 1,
-          entries: omit(this.state.entries, id)
+          entries: omit(this.state.entries, id),
+          entriesErrors: omit(this.state.entries, id)
         }
       })
     }
@@ -465,6 +480,7 @@ export default class TransactionForm extends React.Component {
         enableDeleteMode={this.enableShift.bind(this)}
         deleteMode={this.state.shiftDown}
         removeEntry={this.removeEntry.bind(this, key)}
+        errorMsgs={this.state.entriesErrors[key]}
         />)
     }
     var submitButton;
@@ -496,6 +512,7 @@ export default class TransactionForm extends React.Component {
               handleAddEntry={this.handleAddEntry}
               disableDeleteMode={this.disableShift.bind(this)}
               enableDeleteMode={this.enableShift.bind(this)}
+              errorMsgs={this.state.transactionDataErrors}
               />
 
             {entries.map(entry => (entry))}

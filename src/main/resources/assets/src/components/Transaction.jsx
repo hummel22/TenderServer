@@ -92,7 +92,8 @@ export default class TransactionForm extends React.Component {
           value={this.props.transactionData.name}
           style={locationTextFieldled}
           onFocus={this.props.disableDeleteMode}
-          onBlur={this.props.enableDeleteMode} />
+          onBlur={this.props.enableDeleteMode}
+          errorText={this.props.errorMsgs.name}/>
 
         <TextField
           id="YearTextField"
@@ -103,7 +104,8 @@ export default class TransactionForm extends React.Component {
           value={this.props.transactionData.year}
           style={textFieldledNum}
           onFocus={this.props.disableDeleteMode}
-          onBlur={this.props.enableDeleteMode} />
+          onBlur={this.props.enableDeleteMode}
+          errorText={this.props.errorMsgs.year}/>
 
         <TextField
           id="MonthTextField"
@@ -114,7 +116,8 @@ export default class TransactionForm extends React.Component {
           value={this.props.transactionData.month}
           style={textFieldledNum}
           onFocus={this.props.disableDeleteMode}
-          onBlur={this.props.enableDeleteMode} />
+          onBlur={this.props.enableDeleteMode}
+          errorText={this.props.errorMsgs.month}/>
 
         <TextField
           id="DayTextField"
@@ -125,7 +128,8 @@ export default class TransactionForm extends React.Component {
           value={this.props.transactionData.day}
           style={textFieldledNum}
           onFocus={this.props.disableDeleteMode}
-          onBlur={this.props.enableDeleteMode} />
+          onBlur={this.props.enableDeleteMode}
+          errorText={this.props.errorMsgs.day}/>
 
 
         <AutoComplete
@@ -143,7 +147,8 @@ export default class TransactionForm extends React.Component {
           onUpdateInput={(val) => {this.props.updateTransactionData("nickname", val)} }
           onNewRequest={(val, index) => {if(index > -1) {this.props.handleSelect("nickname", val)}}}
           onFocus={this.props.disableDeleteMode}
-          onBlur={this.props.enableDeleteMode}/>
+          onBlur={this.props.enableDeleteMode}
+          errorText={this.props.errorMsgs.nickname}/>
 
         <TextField
           id="LocationTextField"
@@ -154,7 +159,8 @@ export default class TransactionForm extends React.Component {
           name="Location"
           style={locationTextFieldled}
           onFocus={this.props.disableDeleteMode}
-          onBlur={this.props.enableDeleteMode}/>
+          onBlur={this.props.enableDeleteMode}
+          errorText={this.props.errorMsgs.location}/>
 
         <TextField
           id="TownTextField"
@@ -165,7 +171,8 @@ export default class TransactionForm extends React.Component {
           name="Town"
           style={textFieldled}
           onFocus={this.props.disableDeleteMode}
-          onBlur={this.props.enableDeleteMode}/>
+          onBlur={this.props.enableDeleteMode}
+          errorText={this.props.errorMsgs.town}/>
 
         <FloatingActionButton
           mini={true}

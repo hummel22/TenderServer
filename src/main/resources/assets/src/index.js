@@ -27,7 +27,6 @@ class App extends React.Component {
     this.reset = this.resetForm.bind(this);
   }
   resetForm() {
-    console.log("Updateing ID")
     this.setState((state,props) => {
       return {uniqueID: this.state.uniqueID+1}
     })
