@@ -14066,7 +14066,8 @@ var Entry = function (_React$Component) {
           textFieldStyle: textFieldled,
           ref: 'nameField',
           onFocus: this.props.disableDeleteMode,
-          onBlur: this.props.enableDeleteMode }),
+          onBlur: this.props.enableDeleteMode,
+          errorText: this.props.errorMsgs.name }),
         _react2.default.createElement(_TextField2.default, {
           type: 'number',
           hintText: 'Value',
@@ -14077,7 +14078,8 @@ var Entry = function (_React$Component) {
           style: textFieldled,
           textFieldStyle: textFieldled,
           onFocus: this.props.disableDeleteMode,
-          onBlur: this.props.enableDeleteMode }),
+          onBlur: this.props.enableDeleteMode,
+          errorText: this.props.errorMsgs.value }),
         _react2.default.createElement(_materialUiChipInput2.default, {
           newChipKeyCodes: [13, 188, 32],
           openOnFocus: true,
@@ -17039,7 +17041,6 @@ var App = function (_React$Component) {
     value: function resetForm() {
       var _this2 = this;
 
-      console.log("Updateing ID");
       this.setState(function (state, props) {
         return { uniqueID: _this2.state.uniqueID + 1 };
       });
@@ -29278,10 +29279,12 @@ var TransactionForm = function (_React$Component) {
         nickname: "",
         location: "",
         town: "" },
+      transactionDataErrors: {},
       transactionID: null,
       numberOfEntries: 0,
       nextEntryID: 0,
       entries: {},
+      entriesErrors: {},
       /*
        Entires have data like
         - name
@@ -29304,7 +29307,6 @@ var TransactionForm = function (_React$Component) {
     _this.keyUp = _this.keyUp.bind(_this);
     _this.getTags = _this.loadTags.bind(_this);
     _this.getLocations = _this.loadLocations.bind(_this);
-
     return _this;
   }
 
@@ -29353,9 +29355,7 @@ var TransactionForm = function (_React$Component) {
       var locationURL = "http://127.0.0.1:8080/api/locations";
       var saveLocations = this.setStateLocations.bind(this);
       fetch(locationURL).then(function (data) {
-        console.log(data);
         data.json().then(function (body) {
-          console.log(body);
           var nicknames = [];
           var locations = {};
           for (var index in body) {
@@ -29377,9 +29377,6 @@ var TransactionForm = function (_React$Component) {
   }, {
     key: 'setStateLocations',
     value: function setStateLocations(locations, nicknames) {
-      console.log(JSON.stringify(locations, null, 2));
-      console.log(JSON.stringify(nicknames, null, 2));
-
       this.setState(function (state, props) {
         return {
           nicknames: nicknames,
@@ -29405,6 +29402,10 @@ var TransactionForm = function (_React$Component) {
             name: "",
             value: -1,
             tags: []
+          })),
+          entriesErrors: Object.assign(state.entriesErrors, _defineProperty({}, nextEntryID, {
+            name: null,
+            value: null
           }))
         };
       });
@@ -29425,9 +29426,7 @@ var TransactionForm = function (_React$Component) {
   }, {
     key: 'handleSelect',
     value: function handleSelect(key, val) {
-      console.log("Selected: " + val);
       var location = this.state.locations[val];
-      console.log(JSON.stringify(location, null, 2));
       this.setState(function (state, props) {
         return { transactionData: Object.assign(state.transactionData, {
             nickname: location.nickname,
@@ -29467,43 +29466,50 @@ var TransactionForm = function (_React$Component) {
   }, {
     key: 'verifyEntry',
     value: function verifyEntry(entry) {
+      var errors = {};
       if (entry.name === "") {
-        throw "No Entry name set";
+        errors["name"] = "Name Required";
       }
-      if (parseInt(entry.value) === -1) {
-        throw "No Entry value set";
+      if (parseInt(entry.value) === -1 || entry.value === "") {
+        errors["value"] = "Value Required";
       }
+      return errors;
     }
   }, {
     key: 'verifyTransaction',
     value: function verifyTransaction(transaction) {
-
+      var errors = {};
       if (transaction.name === "") {
-        throw "No transaction name set";
+        errors["name"] = "Name Required";
       }
-      if (parseInt(transaction.year) === -1) {
-        throw "No transaction year set";
-      }
-
-      if (parseInt(transaction.month) === -1) {
-        throw "No transaction month set";
+      if (parseInt(transaction.year) === -1 || transaction.year === "") {
+        errors["year"] = "Year Required 20[XX]";
       }
 
-      if (parseInt(transaction.day) === -1) {
-        throw "No transaction day set";
+      if (parseInt(transaction.month) === -1 || transaction.month === "") {
+        errors["month"] = "Month Required";
+      }
+
+      if (parseInt(transaction.day) === -1 || transaction.day === "") {
+        errors["day"] = "Day Required";
       }
 
       if (transaction.nickname === "") {
-        throw "No transaction nickname set";
+        errors["nickname"] = "Name Required";
       }
 
       if (transaction.location === "") {
-        throw "No transaction location set";
+        errors["location"] = "Name Required";
       }
 
       if (transaction.town === "") {
-        throw "No transaction town set";
+        errors["town"] = "Name Required";
       }
+      return errors;
+    }
+  }, {
+    key: 'buildTransaction',
+    value: function buildTransaction(transaction) {
       var month = transaction.month;
       if (parseInt(transaction.month) < 10) {
         month = "0" + transaction.month;
@@ -29524,15 +29530,72 @@ var TransactionForm = function (_React$Component) {
       return body;
     }
   }, {
+    key: 'buildEntry',
+    value: function buildEntry(entry, id) {
+      return {
+        name: entry.name,
+        value: entry.value,
+        transaction_id: id,
+        tags: entry.tags
+      };
+    }
+  }, {
     key: 'sendTransaction',
-    value: function sendTransaction(transaction) {
-      var data = {};
-      return 24;
+    value: function sendTransaction(transaction, entries) {
+      this.prettyPrint(transaction);
+      var transactionURL = "http://127.0.0.1:8080/api/transactions";
+      var sendEntries = this.sendEntries.bind(this);
+      fetch(transactionURL, {
+        method: 'POST',
+        mode: 'cors',
+        redirect: 'follow',
+        headers: new Headers({
+          'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(transaction)
+      }).then(function (resp) {
+        resp.json().then(function (body) {
+          console.log(body);
+          sendEntries(entries, body.transactionId);
+        });
+      }).catch(function (error) {
+        throw error;
+      });
+    }
+  }, {
+    key: 'sendEntries',
+    value: function sendEntries(entries, id) {
+      for (var index in entries) {
+        var entry = this.buildEntry(entries[index], id);
+        this.sendEntry(entry);
+      }
+      this.clear();
     }
   }, {
     key: 'sendEntry',
     value: function sendEntry(entry) {
-      var data = {};
+      this.prettyPrint(entry);
+      var entryURL = "http://127.0.0.1:8080/api/entries";
+      fetch(entryURL, {
+        method: 'POST',
+        mode: 'cors',
+        redirect: 'follow',
+        headers: new Headers({
+          'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(entry)
+      }).then(function (resp) {
+        resp.json().then(function (body) {
+          console.log(body);
+        });
+      }).catch(function (error) {
+        throw error;
+      });
+    }
+  }, {
+    key: 'prettyPrint',
+    value: function prettyPrint(obj) {
+      console.log(JSON.stringify(obj, null, 2));
     }
   }, {
     key: 'clear',
@@ -29540,63 +29603,58 @@ var TransactionForm = function (_React$Component) {
       this.props.reset();
     }
   }, {
+    key: 'checkEmpty',
+    value: function checkEmpty(obj) {
+      return Object.keys(obj).length === 0 && obj.constructor === Object;
+    }
+  }, {
+    key: 'hasErrors',
+    value: function hasErrors(transactionErrors, entryErrors) {
+      if (!this.checkEmpty(transactionErrors)) {
+        return true;
+      }
+      if (!this.checkEmpty(entryErrors)) {
+        for (var index in entryErrors) {
+          if (!this.checkEmpty(entryErrors[index])) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+  }, {
     key: 'handleSubmit',
     value: function handleSubmit() {
-      try {
-        var transaction = this.verifyTransaction(this.state.transactionData);
-        for (var index in this.state.entries) {
-          this.verifyEntry(this.state.entries[index]);
-          var entry = this.state.entries[index];
-          var body = {
-            name: entry.name,
-            value: entry.value,
-            transaction_id: id,
-            tags: entry.tags
+      var transactionErrors = this.verifyTransaction(this.state.transactionData);
+      var entryErrors = {};
+      for (var index in this.state.entries) {
+        entryErrors[index] = this.verifyEntry(this.state.entries[index]);
+      }
+
+      this.prettyPrint(transactionErrors);
+      this.prettyPrint(entryErrors);
+      console.log("Errors Tran: " + this.checkEmpty(transactionErrors));
+      console.log("Errors Entr: " + this.checkEmpty(entryErrors));
+      console.log("ERRORS: " + this.hasErrors(transactionErrors, entryErrors));
+
+      if (this.hasErrors(transactionErrors, entryErrors)) {
+        this.setState(function (state, props) {
+          return {
+            transactionDataErrors: transactionErrors,
+            entriesErrors: entryErrors
           };
-          console.log(JSON.stringify(body, null, 2));
-        }
-      } catch (err) {
-        console.log(err);
-        //TODO notification
-        throw err;
+        });
+        throw "Missing Fields";
       }
 
-      //TODO spinny loader
-      console.log(JSON.stringify(transaction, null, 2));
-
+      var id = null;
       try {
-        //Stop spinny
-        var id = this.sendTransaction(transaction);
-        //CheckMark Spinny
+        var transaction = this.buildTransaction(this.state.transactionData);
+        id = this.sendTransaction(transaction, this.state.entries);
       } catch (err) {
         console.log(err);
-        //Stop spinny
-        //TODO notification
         throw err;
       }
-
-      try {
-        //Stop spinny
-        for (var index in this.state.entries) {
-          var entry = this.state.entries[index];
-          var body = {
-            name: entry.name,
-            value: entry.value,
-            transaction_id: id,
-            tags: entry.tags
-          };
-          this.sendEntry(this.state.entries[index], id);
-        }
-        //CheckMark Spinny
-      } catch (err) {
-        console.log(err);
-        //Stop spinny
-        //TODO notification
-        throw err;
-      }
-
-      //Success Notify
-      this.clear();
     }
   }, {
     key: 'deleteTag',
@@ -29647,11 +29705,11 @@ var TransactionForm = function (_React$Component) {
     value: function removeEntry(id) {
       var _this2 = this;
 
-      console.log("Remove: " + id);
       this.setState(function (state, props) {
         return {
           numberOfEntries: _this2.state.numberOfEntries - 1,
-          entries: omit(_this2.state.entries, id)
+          entries: omit(_this2.state.entries, id),
+          entriesErrors: omit(_this2.state.entries, id)
         };
       });
     }
@@ -29685,7 +29743,8 @@ var TransactionForm = function (_React$Component) {
           disableDeleteMode: this.disableShift.bind(this),
           enableDeleteMode: this.enableShift.bind(this),
           deleteMode: this.state.shiftDown,
-          removeEntry: this.removeEntry.bind(this, key)
+          removeEntry: this.removeEntry.bind(this, key),
+          errorMsgs: this.state.entriesErrors[key]
         }));
       }
       var submitButton;
@@ -29720,7 +29779,8 @@ var TransactionForm = function (_React$Component) {
               handleSelect: this.handleSelect.bind(this),
               handleAddEntry: this.handleAddEntry,
               disableDeleteMode: this.disableShift.bind(this),
-              enableDeleteMode: this.enableShift.bind(this)
+              enableDeleteMode: this.enableShift.bind(this),
+              errorMsgs: this.state.transactionDataErrors
             }),
             entries.map(function (entry) {
               return entry;
@@ -44835,7 +44895,8 @@ var TransactionForm = function (_React$Component) {
           value: this.props.transactionData.name,
           style: locationTextFieldled,
           onFocus: this.props.disableDeleteMode,
-          onBlur: this.props.enableDeleteMode }),
+          onBlur: this.props.enableDeleteMode,
+          errorText: this.props.errorMsgs.name }),
         _react2.default.createElement(_TextField2.default, {
           id: 'YearTextField',
           type: 'number',
@@ -44847,7 +44908,8 @@ var TransactionForm = function (_React$Component) {
           value: this.props.transactionData.year,
           style: textFieldledNum,
           onFocus: this.props.disableDeleteMode,
-          onBlur: this.props.enableDeleteMode }),
+          onBlur: this.props.enableDeleteMode,
+          errorText: this.props.errorMsgs.year }),
         _react2.default.createElement(_TextField2.default, {
           id: 'MonthTextField',
           type: 'number',
@@ -44859,7 +44921,8 @@ var TransactionForm = function (_React$Component) {
           value: this.props.transactionData.month,
           style: textFieldledNum,
           onFocus: this.props.disableDeleteMode,
-          onBlur: this.props.enableDeleteMode }),
+          onBlur: this.props.enableDeleteMode,
+          errorText: this.props.errorMsgs.month }),
         _react2.default.createElement(_TextField2.default, {
           id: 'DayTextField',
           type: 'number',
@@ -44871,7 +44934,8 @@ var TransactionForm = function (_React$Component) {
           value: this.props.transactionData.day,
           style: textFieldledNum,
           onFocus: this.props.disableDeleteMode,
-          onBlur: this.props.enableDeleteMode }),
+          onBlur: this.props.enableDeleteMode,
+          errorText: this.props.errorMsgs.day }),
         _react2.default.createElement(_AutoComplete2.default, {
           id: 'NickNameTextField',
           hintText: 'NickName',
@@ -44893,7 +44957,8 @@ var TransactionForm = function (_React$Component) {
             }
           },
           onFocus: this.props.disableDeleteMode,
-          onBlur: this.props.enableDeleteMode }),
+          onBlur: this.props.enableDeleteMode,
+          errorText: this.props.errorMsgs.nickname }),
         _react2.default.createElement(_TextField2.default, {
           id: 'LocationTextField',
           value: this.props.transactionData.location,
@@ -44905,7 +44970,8 @@ var TransactionForm = function (_React$Component) {
           name: 'Location',
           style: locationTextFieldled,
           onFocus: this.props.disableDeleteMode,
-          onBlur: this.props.enableDeleteMode }),
+          onBlur: this.props.enableDeleteMode,
+          errorText: this.props.errorMsgs.location }),
         _react2.default.createElement(_TextField2.default, {
           id: 'TownTextField',
           type: 'text',
@@ -44917,7 +44983,8 @@ var TransactionForm = function (_React$Component) {
           name: 'Town',
           style: textFieldled,
           onFocus: this.props.disableDeleteMode,
-          onBlur: this.props.enableDeleteMode }),
+          onBlur: this.props.enableDeleteMode,
+          errorText: this.props.errorMsgs.town }),
         _react2.default.createElement(
           _FloatingActionButton2.default,
           {

@@ -101,6 +101,13 @@ export default class TransactionForm extends React.Component {
           hintText="Year"
           onChange={(ev) => {this.props.handleChange("year", ev)}}
           name="Year"
+          onInput={(e)=>{
+            e.target.value = Math.max(0, parseInt(e.target.value) ).toString().slice(0,2)
+            if(parseInt(e.target.value) >= 10)  {
+              this.monthField.focus();
+            }
+          }}
+          min={0}
           value={this.props.transactionData.year}
           style={textFieldledNum}
           onFocus={this.props.disableDeleteMode}
@@ -111,25 +118,41 @@ export default class TransactionForm extends React.Component {
           id="MonthTextField"
           type="number"
           hintText="Month"
+          onInput={(e)=>{
+            e.target.value = Math.max(0, parseInt(e.target.value) ).toString().slice(0,2)
+            if(parseInt(e.target.value) >= 10)  {
+              this.dayField.focus();
+            }
+          }}
+          min={0}
           onChange={(ev) => {this.props.handleChange("month", ev)}}
           name="Month"
           value={this.props.transactionData.month}
           style={textFieldledNum}
           onFocus={this.props.disableDeleteMode}
           onBlur={this.props.enableDeleteMode}
-          errorText={this.props.errorMsgs.month}/>
+          errorText={this.props.errorMsgs.month}
+          ref={(input) => { this.monthField = input; }}/>
 
         <TextField
           id="DayTextField"
           type="number"
           hintText="Day"
+          onInput={(e)=>{
+            e.target.value = Math.max(0, parseInt(e.target.value) ).toString().slice(0,2)
+            if(parseInt(e.target.value) >= 10)  {
+              this.nickNameField.focus();
+            }
+          }}
+          min={0}
           onChange={(ev) =>{this.props.handleChange("day", ev)}}
           name="Day"
           value={this.props.transactionData.day}
           style={textFieldledNum}
           onFocus={this.props.disableDeleteMode}
           onBlur={this.props.enableDeleteMode}
-          errorText={this.props.errorMsgs.day}/>
+          errorText={this.props.errorMsgs.day}
+          ref={(input) => { this.dayField = input; }}/>
 
 
         <AutoComplete
@@ -148,7 +171,8 @@ export default class TransactionForm extends React.Component {
           onNewRequest={(val, index) => {if(index > -1) {this.props.handleSelect("nickname", val)}}}
           onFocus={this.props.disableDeleteMode}
           onBlur={this.props.enableDeleteMode}
-          errorText={this.props.errorMsgs.nickname}/>
+          errorText={this.props.errorMsgs.nickname}
+          ref={(input) => { this.nickNameField = input; }}/>
 
         <TextField
           id="LocationTextField"

@@ -320,13 +320,58 @@ export default class TransactionForm extends React.Component {
     }
   }
 
-  sendTransaction(transaction)  {
+  sendTransaction(transaction, entries)  {
     this.prettyPrint(transaction);
-    return 24;
+    var transactionURL = "http://127.0.0.1:8080/api/transactions"
+    var sendEntries = this.sendEntries.bind(this);
+    fetch(transactionURL, {
+    	method: 'POST',
+    	mode: 'cors',
+    	redirect: 'follow',
+    	headers: new Headers({
+    		'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify(transaction)
+     })
+    .then(function(resp) {
+      resp.json().then((body => {
+        console.log(body);
+        sendEntries(entries, body.transactionId)
+      }))
+    })
+    .catch(function(error){
+      throw error;
+    })
+  }
+
+  sendEntries(entries, id)  {
+    for(var index in entries)  {
+      var entry = this.buildEntry(entries[index], id)
+      this.sendEntry(entry);
+    }
+    this.clear();
   }
 
   sendEntry(entry)  {
     this.prettyPrint(entry);
+    var entryURL = "http://127.0.0.1:8080/api/entries"
+    fetch(entryURL, {
+      method: 'POST',
+      mode: 'cors',
+      redirect: 'follow',
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify(entry)
+     })
+    .then(function(resp) {
+      resp.json().then((body => {
+        console.log(body);
+      }))
+    })
+    .catch(function(error){
+      throw error;
+    })
   }
 
 
@@ -382,23 +427,11 @@ export default class TransactionForm extends React.Component {
     var id = null;
     try{
       var transaction = this.buildTransaction(this.state.transactionData);
-      id = this.sendTransaction(transaction);
+      id = this.sendTransaction(transaction, this.state.entries);
     } catch(err)  {
       console.log(err);
       throw err;
     }
-
-    try{
-      for(var index in this.state.entries)  {
-        var entry = this.buildEntry(this.state.entries[index], id)
-        this.sendEntry(entry);
-      }
-    } catch(err)  {
-      console.log(err);
-      throw err;
-    }
-
-    this.clear();
   }
 
   deleteTag(id, tag){
