@@ -175,7 +175,7 @@ export default class TransactionForm extends React.Component {
           id="LocationTextField"
           value={this.props.transactionData.location}
           type="text"
-          hintText="Location"
+          hintText="Business"
           onChange={(ev) => this.props.handleChange("location", ev)}
           name="Location"
           style={locationTextFieldled}
