@@ -188,7 +188,7 @@ export default class TransactionForm extends React.Component {
         nextEntryID: nextEntryID,
         entries: Object.assign(state.entries, {[nextEntryID]:{
           name: "",
-          value: -1,
+          value: null,
           tags: []
         }}),
         entriesErrors: Object.assign(state.entriesErrors, {[nextEntryID]:{
@@ -264,15 +264,15 @@ export default class TransactionForm extends React.Component {
     if(transaction.name === "") {
       errors["name"] = "Name Required";
     }
-    if(parseInt(transaction.year) === -1 || transaction.year === "")  {
+    if(parseInt(transaction.year) === null || transaction.year === "")  {
       errors["year"] = "Year Required 20[XX]";
     }
 
-    if(parseInt(transaction.month) === -1 || transaction.month === "") {
+    if(parseInt(transaction.month) === null || transaction.month === "") {
       errors["month"] = "Month Required";
     }
 
-    if(parseInt(transaction.day) === -1 || transaction.day === "") {
+    if(parseInt(transaction.day) === null || transaction.day === "") {
       errors["day"] = "Day Required";
     }
 
@@ -500,6 +500,7 @@ export default class TransactionForm extends React.Component {
 
   render() {
     var entries = []
+    var total = 0.0;
     for(var key in this.state.entries) {
       entries.push(<Entry
         key={key}
@@ -515,6 +516,9 @@ export default class TransactionForm extends React.Component {
         removeEntry={this.removeEntry.bind(this, key)}
         errorMsgs={this.state.entriesErrors[key]}
         />)
+        if(this.state.entries[key].value !== null) {
+          total += parseFloat(this.state.entries[key].value);
+        }
     }
     var submitButton;
     if(this.state.shiftDown)  {
@@ -549,6 +553,14 @@ export default class TransactionForm extends React.Component {
               />
 
             {entries.map(entry => (entry))}
+
+            <div className="horizontal">
+              <TextField
+                floatingLabelFixed={true}
+                floatingLabelText="Total"
+                value={total}
+                style={textFieldled}/>
+            </div>
 
             {submitButton}
           </div>
