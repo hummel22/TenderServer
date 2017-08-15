@@ -102,8 +102,7 @@ export default class TransactionForm extends React.Component {
           onChange={(ev) => {this.props.handleChange("year", ev)}}
           name="Year"
           onInput={(e)=>{
-            e.target.value = Math.max(0, parseInt(e.target.value) ).toString().slice(0,2)
-            if(parseInt(e.target.value) >= 10)  {
+            if(parseInt(e.target.value.length) >= 2)  {
               this.monthField.focus();
             }
           }}
@@ -119,8 +118,7 @@ export default class TransactionForm extends React.Component {
           type="number"
           hintText="Month"
           onInput={(e)=>{
-            e.target.value = Math.max(0, parseInt(e.target.value) ).toString().slice(0,2)
-            if(parseInt(e.target.value) >= 10)  {
+            if(parseInt(e.target.value.length) >= 2)  {
               this.dayField.focus();
             }
           }}
@@ -139,8 +137,7 @@ export default class TransactionForm extends React.Component {
           type="number"
           hintText="Day"
           onInput={(e)=>{
-            e.target.value = Math.max(0, parseInt(e.target.value) ).toString().slice(0,2)
-            if(parseInt(e.target.value) >= 10)  {
+            if(parseInt(e.target.value.length) >= 2)  {
               this.nickNameField.focus();
             }
           }}
