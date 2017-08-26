@@ -57,13 +57,18 @@ const bottom = {
 export default class TransactionForm extends React.Component {
   constructor(props) {
     super(props);
+
+    var dateObject = new Date();
+    var year = dateObject.getFullYear() % 2000
+    var month = dateObject.getMonth();
+    var day = dateObject.getDate();
     this.state = {
       transactionData: {
         name: "",
         date: "",
-        year: "",
-        month: "",
-        day: "",
+        year: year,
+        month: month,
+        day: day,
         nickname: "",
         location: "",
         town: "" },
@@ -334,10 +339,14 @@ export default class TransactionForm extends React.Component {
       body: JSON.stringify(transaction)
      })
     .then(function(resp) {
-      resp.json().then((body => {
-        console.log(body);
-        sendEntries(entries, body.transactionId)
-      }))
+      if(resp.status) {
+        resp.json().then((body => {
+          console.log(body);
+          sendEntries(entries, body.transactionId)
+        }))
+      } else {
+        throw ("Transaction Failed")
+      }
     })
     .catch(function(error){
       throw error;
@@ -365,9 +374,12 @@ export default class TransactionForm extends React.Component {
       body: JSON.stringify(entry)
      })
     .then(function(resp) {
-      resp.json().then((body => {
-        console.log(body);
-      }))
+      if(resp.status === 200) {
+        //Send the next entry! - Need a list that i Can iteraorot and pass down
+        resp.json().then((body => {
+          console.log(body);
+        }))
+      }
     })
     .catch(function(error){
       throw error;

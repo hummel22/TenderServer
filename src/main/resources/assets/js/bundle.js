@@ -29400,7 +29400,7 @@ var TransactionForm = function (_React$Component) {
           nextEntryID: nextEntryID,
           entries: Object.assign(state.entries, _defineProperty({}, nextEntryID, {
             name: "",
-            value: -1,
+            value: null,
             tags: []
           })),
           entriesErrors: Object.assign(state.entriesErrors, _defineProperty({}, nextEntryID, {
@@ -29482,15 +29482,15 @@ var TransactionForm = function (_React$Component) {
       if (transaction.name === "") {
         errors["name"] = "Name Required";
       }
-      if (parseInt(transaction.year) === -1 || transaction.year === "") {
+      if (parseInt(transaction.year) === null || transaction.year === "") {
         errors["year"] = "Year Required 20[XX]";
       }
 
-      if (parseInt(transaction.month) === -1 || transaction.month === "") {
+      if (parseInt(transaction.month) === null || transaction.month === "") {
         errors["month"] = "Month Required";
       }
 
-      if (parseInt(transaction.day) === -1 || transaction.day === "") {
+      if (parseInt(transaction.day) === null || transaction.day === "") {
         errors["day"] = "Day Required";
       }
 
@@ -29512,11 +29512,11 @@ var TransactionForm = function (_React$Component) {
     value: function buildTransaction(transaction) {
       var month = transaction.month;
       if (parseInt(transaction.month) < 10) {
-        month = "0" + transaction.month;
+        month = "0" + parseInt(ransaction.month);
       }
       var day = transaction.day;
       if (parseInt(transaction.day) < 10) {
-        day = "0" + transaction.day;
+        day = "0" + parseInt(ransaction.day);
       }
       var body = {
         name: transaction.name,
@@ -29731,6 +29731,7 @@ var TransactionForm = function (_React$Component) {
     key: 'render',
     value: function render() {
       var entries = [];
+      var total = 0.0;
       for (var key in this.state.entries) {
         entries.push(_react2.default.createElement(_Entry2.default, {
           key: key,
@@ -29746,6 +29747,9 @@ var TransactionForm = function (_React$Component) {
           removeEntry: this.removeEntry.bind(this, key),
           errorMsgs: this.state.entriesErrors[key]
         }));
+        if (this.state.entries[key].value !== null) {
+          total += parseFloat(this.state.entries[key].value);
+        }
       }
       var submitButton;
       if (this.state.shiftDown) {
@@ -29785,6 +29789,15 @@ var TransactionForm = function (_React$Component) {
             entries.map(function (entry) {
               return entry;
             }),
+            _react2.default.createElement(
+              'div',
+              { className: 'horizontal' },
+              _react2.default.createElement(_TextField2.default, {
+                floatingLabelFixed: true,
+                floatingLabelText: 'Total',
+                value: total,
+                style: textFieldled })
+            ),
             submitButton
           )
         )
@@ -44905,6 +44918,12 @@ var TransactionForm = function (_React$Component) {
             _this2.props.handleChange("year", ev);
           },
           name: 'Year',
+          onInput: function onInput(e) {
+            if (parseInt(e.target.value.length) >= 2) {
+              _this2.monthField.focus();
+            }
+          },
+          min: 0,
           value: this.props.transactionData.year,
           style: textFieldledNum,
           onFocus: this.props.disableDeleteMode,
@@ -44914,6 +44933,12 @@ var TransactionForm = function (_React$Component) {
           id: 'MonthTextField',
           type: 'number',
           hintText: 'Month',
+          onInput: function onInput(e) {
+            if (parseInt(e.target.value.length) >= 2) {
+              _this2.dayField.focus();
+            }
+          },
+          min: 0,
           onChange: function onChange(ev) {
             _this2.props.handleChange("month", ev);
           },
@@ -44922,11 +44947,20 @@ var TransactionForm = function (_React$Component) {
           style: textFieldledNum,
           onFocus: this.props.disableDeleteMode,
           onBlur: this.props.enableDeleteMode,
-          errorText: this.props.errorMsgs.month }),
+          errorText: this.props.errorMsgs.month,
+          ref: function ref(input) {
+            _this2.monthField = input;
+          } }),
         _react2.default.createElement(_TextField2.default, {
           id: 'DayTextField',
           type: 'number',
           hintText: 'Day',
+          onInput: function onInput(e) {
+            if (parseInt(e.target.value.length) >= 2) {
+              _this2.nickNameField.focus();
+            }
+          },
+          min: 0,
           onChange: function onChange(ev) {
             _this2.props.handleChange("day", ev);
           },
@@ -44935,7 +44969,10 @@ var TransactionForm = function (_React$Component) {
           style: textFieldledNum,
           onFocus: this.props.disableDeleteMode,
           onBlur: this.props.enableDeleteMode,
-          errorText: this.props.errorMsgs.day }),
+          errorText: this.props.errorMsgs.day,
+          ref: function ref(input) {
+            _this2.dayField = input;
+          } }),
         _react2.default.createElement(_AutoComplete2.default, {
           id: 'NickNameTextField',
           hintText: 'NickName',
@@ -44958,12 +44995,15 @@ var TransactionForm = function (_React$Component) {
           },
           onFocus: this.props.disableDeleteMode,
           onBlur: this.props.enableDeleteMode,
-          errorText: this.props.errorMsgs.nickname }),
+          errorText: this.props.errorMsgs.nickname,
+          ref: function ref(input) {
+            _this2.nickNameField = input;
+          } }),
         _react2.default.createElement(_TextField2.default, {
           id: 'LocationTextField',
           value: this.props.transactionData.location,
           type: 'text',
-          hintText: 'Location',
+          hintText: 'Business',
           onChange: function onChange(ev) {
             return _this2.props.handleChange("location", ev);
           },

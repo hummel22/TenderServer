@@ -1,6 +1,9 @@
 #!/usr/local/bin/bash
 set -e
 
+if [ $# -eq 0 ]; then
+  NO_OPS="set"
+fi
 
 while [[ $# -gt 0 ]]
 do
@@ -31,16 +34,29 @@ case $key in
     RUN="set"
     ;;
     *)
-            # unknown option
+    NO_OPS="set"
+    echo "$key is not a valid options"
+
     ;;
 esac
 shift
 done
 
 
+
+
 CURRENT=`pwd`
 ASSETS="src/main/resources/assets"
 
+if [[ -v NO_OPS ]]; then
+    echo "Options"
+    echo " -m, --migrate    -- Run a dry migration"
+    echo " -fr, --frontend  -- Run tiny server for front end dev"
+    echo " -c, --compile    -- Compile front/backend"
+    echo " -r, --run        -- Run backend server"
+    echo " -s, --shutdown   -- Shutdown TBD"
+    echo " -a, --all        -- Compile and run server"    # unknown option
+fi
 
 if [[ -v MIGRATE ]]; then
     echo "Migrate Dry Run"
