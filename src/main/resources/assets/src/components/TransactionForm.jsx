@@ -298,11 +298,11 @@ export default class TransactionForm extends React.Component {
   buildTransaction(transaction) {
     var month = transaction.month
     if(parseInt(transaction.month) < 10)  {
-      month = "0" + parseInt(ransaction.month);
+      month = "0" + parseInt(transaction.month);
     }
     var day = transaction.day
     if(parseInt(transaction.day) < 10)  {
-      day = "0" + parseInt(ransaction.day);
+      day = "0" + parseInt(transaction.day);
     }
     var body = {
       name: transaction.name,
