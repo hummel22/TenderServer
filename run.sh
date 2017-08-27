@@ -1,10 +1,26 @@
 #!/usr/local/bin/bash
 set -e
 
+
+
+#default Values
+
+#static variables
+CONFIG_LOCAL=local
+CONFIG_SERVER=server
+CONFIG_DEV=dev
+CONFIG_PROD=prod
+
+#Defautls
+CONFIG_MOD=$CONFIG_DEV
+CONFIG_LOCATION=$CONFIG_LOCAL
+
 if [ $# -eq 0 ]; then
   NO_OPS="set"
 fi
 
+
+# ParseArgs
 while [[ $# -gt 0 ]]
 do
 key="$1"
@@ -33,6 +49,9 @@ case $key in
     COMPILE="set"
     RUN="set"
     ;;
+    -p|--prod)
+    CONFIG_MOD=$CONFIG_PROD
+    ;;
     *)
     NO_OPS="set"
     echo "$key is not a valid options"
@@ -51,16 +70,21 @@ ASSETS="src/main/resources/assets"
 if [[ -v NO_OPS ]]; then
     echo "Options"
     echo " -m, --migrate    -- Run a dry migration"
+    echo " -f, --migrate-force -- Run a real migration"
     echo " -fr, --frontend  -- Run tiny server for front end dev"
     echo " -c, --compile    -- Compile front/backend"
     echo " -r, --run        -- Run backend server"
     echo " -s, --shutdown   -- Shutdown TBD"
     echo " -a, --all        -- Compile and run server"    # unknown option
+    echo " -p, --prod       -- Run using prod config.yml (Defautl is dev)"
 fi
+
+
+CONFIG_YML=${CONFIG_LOCATION}_${CONFIG_MOD}.yml
 
 if [[ -v MIGRATE ]]; then
     echo "Migrate Dry Run"
-     java -jar ./target/com.olledeux-0.0.1.jar db migrate config.yml --dry-run
+     java -jar ./target/com.olledeux-0.0.1.jar db migrate $CONFIG_YML --dry-run
 fi
 
 if [[ -v FRONT ]]; then 
@@ -77,7 +101,7 @@ if [[ -v MIGRATE_REAL ]]; then
     if [[ "$response" =~ ^(yes|y)$ ]]
     then
       echo "DIDIT"
-      #java -jar ./target/com.olledeux-0.0.1.jar db migrate config.yml
+      java -jar ./target/com.olledeux-0.0.1.jar db migrate $CONFIG_YML
     fi
 fi
 
@@ -91,7 +115,7 @@ if [[ -v COMPILE ]];then
 fi
 
 if [[ -v RUN ]];then 
-    java -jar ./target/com.olledeux-0.0.1.jar server config.yml
+    java -jar ./target/com.olledeux-0.0.1.jar server $CONFIG_YML
     echo "Run"; 
 fi
 
@@ -108,4 +132,4 @@ npm install
 webpack --progress --colors
 
 cd $CURRENT
-mvn clean install && java -jar ./target/com.olledeux-0.0.1.jar server config.yml
+mvn clean install && java -jar ./target/com.olledeux-0.0.1.jar server $CONFIG_YML
